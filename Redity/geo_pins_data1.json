@@ -1,0 +1,34 @@
+{
+"areaId":1,
+"pins":
+[
+{
+"cardId":18,
+"meeting_time":"1469457005",
+"title":"Some test 18",
+"lat":53.861914,
+"long":27.506418
+},
+{
+"cardId":17,
+"meeting_time":"1468435645",
+"title":"Some test, longer17",
+"lat":53.868494,
+"long":27.468138
+},
+{
+"cardId":16,
+"meeting_time":"1461920711",
+"title":"That is a very long text line, so 16",
+"lat":53.845308,
+"long":27.561522
+},
+{
+"cardId":20,
+"meeting_time":"1469609280",
+"title":"Some test 20",
+"lat":53.872643,
+"long":27.590189
+}
+]
+}

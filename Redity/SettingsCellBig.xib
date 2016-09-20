@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9532" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <mutableArray key="SF-UI-Text-Medium.ttf">
+            <string>SFUIText-Medium</string>
+        </mutableArray>
+        <mutableArray key="SF-UI-Text-Regular.ttf">
+            <string>SFUIText-Regular</string>
+        </mutableArray>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="settings_cell_big" rowHeight="105" id="aEU-Zh-k3A" customClass="SettingsCellBig" customModule="Redity" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="350" height="100"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="aEU-Zh-k3A" id="W6z-31-OKO">
+                <rect key="frame" x="0.0" y="0.0" width="350" height="99"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WuX-Nv-xBr">
+                        <rect key="frame" x="17" y="21" width="42" height="62"/>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jok-LQ-6NH">
+                        <rect key="frame" x="79" y="13" width="40" height="18"/>
+                        <fontDescription key="fontDescription" name="SFUIText-Medium" family="SF UI Text" pointSize="15"/>
+                        <color key="textColor" red="0.15686274510000001" green="0.15686274510000001" blue="0.15686274510000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WcN-o1-Xs5">
+                        <rect key="frame" x="79" y="39" width="34" height="16"/>
+                        <fontDescription key="fontDescription" name="SFUIText-Regular" family="SF UI Text" pointSize="13"/>
+                        <color key="textColor" red="0.15686274510000001" green="0.15686274510000001" blue="0.15686274510000001" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="settings_disclosure_icon" translatesAutoresizingMaskIntoConstraints="NO" id="ZLP-Md-Wc0">
+                        <rect key="frame" x="313" y="39" width="17" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="ZLP-Md-Wc0" secondAttribute="height" multiplier="66:100" id="sFm-1I-Fkh"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="jok-LQ-6NH" firstAttribute="leading" secondItem="W6z-31-OKO" secondAttribute="trailing" multiplier="0.225" id="2Mq-il-dxu"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="leading" secondItem="W6z-31-OKO" secondAttribute="leading" constant="17" id="CA4-zw-3TA"/>
+                    <constraint firstItem="ZLP-Md-Wc0" firstAttribute="centerY" secondItem="W6z-31-OKO" secondAttribute="centerY" id="DpS-d1-xTK"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="width" secondItem="W6z-31-OKO" secondAttribute="width" multiplier="12:100" priority="750" id="IIG-Wv-x7t"/>
+                    <constraint firstItem="jok-LQ-6NH" firstAttribute="top" secondItem="W6z-31-OKO" secondAttribute="top" constant="13" id="P7g-D1-WqG"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="height" secondItem="W6z-31-OKO" secondAttribute="height" multiplier="6:10" priority="750" id="SzZ-DP-yhp"/>
+                    <constraint firstItem="ZLP-Md-Wc0" firstAttribute="height" secondItem="W6z-31-OKO" secondAttribute="height" multiplier="1:4" id="a9b-E4-Dgw"/>
+                    <constraint firstItem="WcN-o1-Xs5" firstAttribute="leading" secondItem="jok-LQ-6NH" secondAttribute="leading" id="cRw-ye-LS7"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="width" relation="lessThanOrEqual" secondItem="W6z-31-OKO" secondAttribute="width" multiplier="12:100" id="euf-aa-RpJ"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="height" relation="lessThanOrEqual" secondItem="W6z-31-OKO" secondAttribute="height" multiplier="6:10" id="ewQ-Qr-6r2"/>
+                    <constraint firstAttribute="trailing" secondItem="ZLP-Md-Wc0" secondAttribute="trailing" constant="20" id="jvd-gy-Qe5"/>
+                    <constraint firstItem="WcN-o1-Xs5" firstAttribute="top" secondItem="jok-LQ-6NH" secondAttribute="bottom" constant="8" id="sHp-yl-9yN"/>
+                    <constraint firstItem="WuX-Nv-xBr" firstAttribute="centerY" secondItem="W6z-31-OKO" secondAttribute="centerY" id="vhg-pJ-ye0"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="icon_image" destination="WuX-Nv-xBr" id="lqn-0z-y7j"/>
+                <outlet property="title_description" destination="WcN-o1-Xs5" id="rG6-FC-Qi7"/>
+                <outlet property="title_head" destination="jok-LQ-6NH" id="juI-xp-KDC"/>
+            </connections>
+            <point key="canvasLocation" x="339" y="180.5"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="settings_disclosure_icon" width="50" height="76"/>
+    </resources>
+</document>

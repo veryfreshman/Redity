@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9532" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="filter_cell_timeframe_picker" id="C3n-gh-AB1" customClass="FilterCellTimeframePicker" customModule="Redity" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="C3n-gh-AB1" id="KmZ-le-S9c">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="VsD-2e-P0H">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                        <date key="date" timeIntervalSinceReferenceDate="488383451.508874">
+                            <!--2016-06-23 14:04:11 +0000-->
+                        </date>
+                        <connections>
+                            <action selector="dateChanged:" destination="C3n-gh-AB1" eventType="valueChanged" id="lvu-tq-9g3"/>
+                        </connections>
+                    </datePicker>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="VsD-2e-P0H" secondAttribute="bottom" id="IIN-1R-29D"/>
+                    <constraint firstItem="VsD-2e-P0H" firstAttribute="centerY" secondItem="KmZ-le-S9c" secondAttribute="centerY" id="TET-mZ-9MI"/>
+                    <constraint firstItem="VsD-2e-P0H" firstAttribute="centerX" secondItem="KmZ-le-S9c" secondAttribute="centerX" id="l7g-1c-HAc"/>
+                    <constraint firstItem="VsD-2e-P0H" firstAttribute="top" secondItem="KmZ-le-S9c" secondAttribute="top" id="szD-mY-dGD"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="datePicker" destination="VsD-2e-P0H" id="fRe-QO-X3I"/>
+            </connections>
+            <point key="canvasLocation" x="315" y="411"/>
+        </tableViewCell>
+    </objects>
+</document>

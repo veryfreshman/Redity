@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9532" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="filter_cell_gender" rowHeight="86" id="0Dd-jC-2Rh" customClass="FilterCellGender" customModule="Redity" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="318" height="86"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0Dd-jC-2Rh" id="hns-hD-buC">
+                <rect key="frame" x="0.0" y="0.0" width="318" height="85"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CP4-6x-u31" userLabel="all_buttons">
+                        <rect key="frame" x="14" y="18" width="290" height="50"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UrY-wm-jJt">
+                        <rect key="frame" x="14" y="25" width="65" height="36"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="UrY-wm-jJt" secondAttribute="height" multiplier="185:100" id="BEM-VI-H8M"/>
+                        </constraints>
+                        <state key="normal" backgroundImage="filter_mw_icon_off"/>
+                        <connections>
+                            <action selector="mwPressed:" destination="0Dd-jC-2Rh" eventType="touchUpInside" id="Xw5-Nz-hQn"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YLq-cD-haU">
+                        <rect key="frame" x="87" y="25" width="65" height="35"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="YLq-cD-haU" secondAttribute="height" multiplier="185:100" id="ug3-GU-kcO"/>
+                        </constraints>
+                        <state key="normal" backgroundImage="filter_ww_icon_off"/>
+                        <connections>
+                            <action selector="wwPressed:" destination="0Dd-jC-2Rh" eventType="touchUpInside" id="bHE-PI-Fer"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iNf-VR-RoD">
+                        <rect key="frame" x="166" y="25" width="65" height="35"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="iNf-VR-RoD" secondAttribute="height" multiplier="185:100" id="RNR-vg-Uhl"/>
+                        </constraints>
+                        <state key="normal" backgroundImage="filter_wm_icon_off"/>
+                        <connections>
+                            <action selector="wmPressed:" destination="0Dd-jC-2Rh" eventType="touchUpInside" id="h7d-XU-Cm9"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7QU-7V-Da2">
+                        <rect key="frame" x="239" y="25" width="65" height="35"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="7QU-7V-Da2" secondAttribute="height" multiplier="185:100" id="lLa-zO-6dQ"/>
+                        </constraints>
+                        <state key="normal" backgroundImage="filter_mm_icon_off"/>
+                        <connections>
+                            <action selector="mmPressed:" destination="0Dd-jC-2Rh" eventType="touchUpInside" id="GfB-fw-QHs"/>
+                        </connections>
+                    </button>
+                    <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cTh-Ao-mtj" userLabel="helper_center">
+                        <rect key="frame" x="87" y="0.0" width="144" height="85"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="YLq-cD-haU" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="2Sz-Fz-Uo2"/>
+                    <constraint firstItem="CP4-6x-u31" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="915:1000" id="8ik-9O-8yM"/>
+                    <constraint firstItem="iNf-VR-RoD" firstAttribute="trailing" secondItem="cTh-Ao-mtj" secondAttribute="trailing" id="9jM-gx-qcN"/>
+                    <constraint firstItem="CP4-6x-u31" firstAttribute="centerX" secondItem="hns-hD-buC" secondAttribute="centerX" id="Bjc-40-0lb"/>
+                    <constraint firstItem="UrY-wm-jJt" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="205:1000" id="F1S-BB-cZT"/>
+                    <constraint firstItem="UrY-wm-jJt" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="HdA-bo-3E4"/>
+                    <constraint firstItem="cTh-Ao-mtj" firstAttribute="centerX" secondItem="hns-hD-buC" secondAttribute="centerX" id="LWi-2n-sM3"/>
+                    <constraint firstItem="cTh-Ao-mtj" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="MlS-NZ-jVG"/>
+                    <constraint firstItem="YLq-cD-haU" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="205:1000" id="N4L-Wj-eCm"/>
+                    <constraint firstItem="7QU-7V-Da2" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="Nbz-tV-EF3"/>
+                    <constraint firstItem="cTh-Ao-mtj" firstAttribute="height" secondItem="hns-hD-buC" secondAttribute="height" id="OX5-KN-hkS"/>
+                    <constraint firstItem="UrY-wm-jJt" firstAttribute="leading" secondItem="CP4-6x-u31" secondAttribute="leading" id="Ral-oK-Nmx"/>
+                    <constraint firstItem="YLq-cD-haU" firstAttribute="leading" secondItem="cTh-Ao-mtj" secondAttribute="leading" id="Udx-55-pR6"/>
+                    <constraint firstItem="cTh-Ao-mtj" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="452:1000" id="Wcl-7b-Zcw"/>
+                    <constraint firstItem="7QU-7V-Da2" firstAttribute="trailing" secondItem="CP4-6x-u31" secondAttribute="trailing" id="a0L-Rv-78I"/>
+                    <constraint firstItem="CP4-6x-u31" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="d8O-jF-9Ow"/>
+                    <constraint firstItem="CP4-6x-u31" firstAttribute="height" secondItem="hns-hD-buC" secondAttribute="height" multiplier="59:100" id="ocA-hh-wZh"/>
+                    <constraint firstItem="7QU-7V-Da2" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="205:1000" id="opB-u6-SLu"/>
+                    <constraint firstItem="iNf-VR-RoD" firstAttribute="centerY" secondItem="hns-hD-buC" secondAttribute="centerY" id="tXK-AV-dRd"/>
+                    <constraint firstItem="iNf-VR-RoD" firstAttribute="width" secondItem="hns-hD-buC" secondAttribute="width" multiplier="205:1000" id="ywC-S7-1HO"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="mm_icon" destination="7QU-7V-Da2" id="PFa-qR-443"/>
+                <outlet property="mw_icon" destination="UrY-wm-jJt" id="dwH-Uy-Xgr"/>
+                <outlet property="wm_icon" destination="iNf-VR-RoD" id="xwk-H6-AhR"/>
+                <outlet property="ww_icon" destination="YLq-cD-haU" id="m5a-zM-MwE"/>
+            </connections>
+            <point key="canvasLocation" x="457" y="490"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="filter_mm_icon_off" width="150" height="81"/>
+        <image name="filter_mw_icon_off" width="150" height="81"/>
+        <image name="filter_wm_icon_off" width="150" height="81"/>
+        <image name="filter_ww_icon_off" width="150" height="81"/>
+    </resources>
+</document>

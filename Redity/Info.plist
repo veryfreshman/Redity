@@ -2,6 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to know which region to show you</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>GothamProMedium.otf</string>
+		<string>SF-UI-Text-Bold.ttf</string>
+		<string>SF-UI-Text-Medium.ttf</string>
+		<string>SF-UI-Text-Regular.ttf</string>
+		<string>SF-UI-Text-Semibold.ttf</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>

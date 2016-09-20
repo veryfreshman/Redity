@@ -1,0 +1,20 @@
+{
+"areaId":2,
+"pins":
+[
+{
+"cardId":13,
+"meeting_time":"1469284800",
+"title":"Some test 13",
+"lat":54.796628,
+"long":26.672058
+},
+{
+"cardId":12,
+"meeting_time":"1399896000",
+"title":"area id 2, longer 12",
+"lat":52.314356,
+"long":29.641113
+}
+]
+}

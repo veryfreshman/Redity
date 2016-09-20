@@ -1,0 +1,36 @@
+{
+"areaId":2,
+"cards":
+[
+{
+"cardId":10,
+"title":"Safeway on El Camino",
+"meeting_time":"1469284900",
+"meeting_approx":"none",
+"person_1":"m",
+"person_2":"w",
+"body":"You were in purple yoga pants. I was looking at protein bars when you walked up to do the same. It was about 11:30 pm on Sunday night. I should have said something to you, as you are gorgeous, but I was caught off guard. I was not expecting someone so hot to be in Safeway at that time I guess. I was in a Giants hat. Anyway, on the off chance you see this, and had any interest in me, feel free to reply!",
+"map":false,
+"transport":true,
+"transport_id":3,
+"images_amount":0,
+"posting_time":"1469284771",
+"areaId":2
+},
+{
+"cardId":9,
+"title":" looking for my friend Jen",
+"meeting_time":"1469198371",
+"meeting_approx":"month",
+"person_1":"m",
+"person_2":"w",
+"body":"Hi,\nJust giving it a try. Your name is Jen, a wonderful Chinese woman used to work in San Francisco as a school teacher. You got an other job in San Mateo school district. We were very close friends and used to meet whenever we had the time. I have sent few emails to you and unfortunately all got bounced back. You used to call me Abe. Iam from Sunnyvale and looking to meet you again.\nIts been around 1 year we do not have any contacts.\nHope you will see this adv.\nMiss you Jen.",
+"map":false,
+"transport":true,
+"transport_id":0,
+"images_amount":0,
+"posting_time":"1469198371",
+"areaId":2
+}
+]
+}
