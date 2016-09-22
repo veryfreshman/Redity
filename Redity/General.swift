@@ -29,6 +29,7 @@ class General {
     static var all_areas_info:[Int:NSMutableDictionary] = [Int:NSMutableDictionary]()
     static var areas_geo_info:[NSMutableDictionary] = []
     static var map_placeholder_gradient:UIImage!
+    static var my_avatar_bg_color:UIColor!
     
     static var temp_card_no:Int = 14
     static var prev_area:Int = -1
@@ -61,6 +62,7 @@ class General {
             card_dict["description_text"] = card["body"] as! String
             let map_present = card["map"] as! Bool
             let transport_present = card["transport"] as! Bool
+            card_dict["nick"] = card["nick"] as! String
             card_dict["map_present"] = map_present
             card_dict["transport_icon_present"] = transport_present
             var transport_id = -1

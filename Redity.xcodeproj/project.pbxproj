@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F30BBC2F11F8BB197ADA296 /* Pods_Redity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99B5616EA8B3B5D1E3C670D0 /* Pods_Redity.framework */; };
+		5270260D1F9FADC0F2C1CB42 /* Pods_RedityUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8CF5F2E7231B285267B1478 /* Pods_RedityUITests.framework */; };
 		8479419D1D3A5830000ABB1C /* PinMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8479419C1D3A5830000ABB1C /* PinMapViewController.swift */; };
 		84B460B71D32302700CCEBEB /* PlacesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B460B61D32302700CCEBEB /* PlacesViewController.swift */; };
 		84B4C3031D26B0DD0001A05A /* General.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B4C3021D26B0DD0001A05A /* General.swift */; };
@@ -38,6 +40,9 @@
 		84C6EF371D467C3A001A0569 /* origin_data2.json in Resources */ = {isa = PBXBuildFile; fileRef = 84C6EF351D467C3A001A0569 /* origin_data2.json */; };
 		84C8B0B81D25640300BD6B62 /* OnePostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C8B0B71D25640300BD6B62 /* OnePostViewController.swift */; };
 		84CF4B251D182DDB00A5BB6B /* GothamProMedium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 84CF4B241D182DDB00A5BB6B /* GothamProMedium.otf */; };
+		84D297CB1D9177E700C4F412 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D297CA1D9177E700C4F412 /* ChatViewController.swift */; };
+		84D297CD1D9190D000C4F412 /* ChatsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D297CC1D9190D000C4F412 /* ChatsListViewController.swift */; };
+		84D297CF1D9199DA00C4F412 /* ChatListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84D297CE1D9199DA00C4F412 /* ChatListCell.xib */; };
 		84D8D9691D0EE93A006C7A62 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8D9681D0EE93A006C7A62 /* AppDelegate.swift */; };
 		84D8D96B1D0EE93A006C7A62 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8D96A1D0EE93A006C7A62 /* MainViewController.swift */; };
 		84D8D96E1D0EE93A006C7A62 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D8D96C1D0EE93A006C7A62 /* Main.storyboard */; };
@@ -45,6 +50,7 @@
 		84D8D9731D0EE93A006C7A62 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84D8D9711D0EE93A006C7A62 /* LaunchScreen.storyboard */; };
 		84D8D97E1D0EE93A006C7A62 /* RedityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8D97D1D0EE93A006C7A62 /* RedityTests.swift */; };
 		84D8D9891D0EE93A006C7A62 /* RedityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84D8D9881D0EE93A006C7A62 /* RedityUITests.swift */; };
+		F31B0FF6D0D07A65B639B198 /* Pods_RedityTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60A265D492480B3DED4EA8FA /* Pods_RedityTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +71,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		194205D9001E99A6C78EB545 /* Pods-Redity.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Redity.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Redity/Pods-Redity.debug.xcconfig"; sourceTree = "<group>"; };
+		3F02291EDE6D72583309CFD3 /* Pods-Redity.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Redity.release.xcconfig"; path = "Pods/Target Support Files/Pods-Redity/Pods-Redity.release.xcconfig"; sourceTree = "<group>"; };
+		46969F455142BE84B9A5E741 /* Pods-RedityTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RedityTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-RedityTests/Pods-RedityTests.release.xcconfig"; sourceTree = "<group>"; };
+		60A265D492480B3DED4EA8FA /* Pods_RedityTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RedityTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8479419C1D3A5830000ABB1C /* PinMapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinMapViewController.swift; sourceTree = "<group>"; };
 		84B460B61D32302700CCEBEB /* PlacesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlacesViewController.swift; sourceTree = "<group>"; };
 		84B4C3021D26B0DD0001A05A /* General.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = General.swift; sourceTree = "<group>"; };
@@ -96,6 +106,9 @@
 		84C6EF351D467C3A001A0569 /* origin_data2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = origin_data2.json; sourceTree = "<group>"; };
 		84C8B0B71D25640300BD6B62 /* OnePostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnePostViewController.swift; sourceTree = "<group>"; };
 		84CF4B241D182DDB00A5BB6B /* GothamProMedium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GothamProMedium.otf; sourceTree = "<group>"; };
+		84D297CA1D9177E700C4F412 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		84D297CC1D9190D000C4F412 /* ChatsListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatsListViewController.swift; sourceTree = "<group>"; };
+		84D297CE1D9199DA00C4F412 /* ChatListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChatListCell.xib; sourceTree = "<group>"; };
 		84D8D9651D0EE93A006C7A62 /* Redity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Redity.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84D8D9681D0EE93A006C7A62 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84D8D96A1D0EE93A006C7A62 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -109,6 +122,11 @@
 		84D8D9841D0EE93A006C7A62 /* RedityUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedityUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84D8D9881D0EE93A006C7A62 /* RedityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedityUITests.swift; sourceTree = "<group>"; };
 		84D8D98A1D0EE93A006C7A62 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9650455DF843788A29A1EA9F /* Pods-RedityUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RedityUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-RedityUITests/Pods-RedityUITests.release.xcconfig"; sourceTree = "<group>"; };
+		99B5616EA8B3B5D1E3C670D0 /* Pods_Redity.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Redity.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8CF5F2E7231B285267B1478 /* Pods_RedityUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RedityUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E38E077D42849E2710AA7F89 /* Pods-RedityUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RedityUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RedityUITests/Pods-RedityUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		E87243D858ED390B417DA5F4 /* Pods-RedityTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RedityTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RedityTests/Pods-RedityTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +134,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F30BBC2F11F8BB197ADA296 /* Pods_Redity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F31B0FF6D0D07A65B639B198 /* Pods_RedityTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,12 +150,36 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5270260D1F9FADC0F2C1CB42 /* Pods_RedityUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		11F388AAB9152F14A2F95A86 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				99B5616EA8B3B5D1E3C670D0 /* Pods_Redity.framework */,
+				60A265D492480B3DED4EA8FA /* Pods_RedityTests.framework */,
+				C8CF5F2E7231B285267B1478 /* Pods_RedityUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		24165F2533CAC627033E63E9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				194205D9001E99A6C78EB545 /* Pods-Redity.debug.xcconfig */,
+				3F02291EDE6D72583309CFD3 /* Pods-Redity.release.xcconfig */,
+				E87243D858ED390B417DA5F4 /* Pods-RedityTests.debug.xcconfig */,
+				46969F455142BE84B9A5E741 /* Pods-RedityTests.release.xcconfig */,
+				E38E077D42849E2710AA7F89 /* Pods-RedityUITests.debug.xcconfig */,
+				9650455DF843788A29A1EA9F /* Pods-RedityUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		84D8D95C1D0EE939006C7A62 = {
 			isa = PBXGroup;
 			children = (
@@ -143,6 +187,8 @@
 				84D8D97C1D0EE93A006C7A62 /* RedityTests */,
 				84D8D9871D0EE93A006C7A62 /* RedityUITests */,
 				84D8D9661D0EE93A006C7A62 /* Products */,
+				24165F2533CAC627033E63E9 /* Pods */,
+				11F388AAB9152F14A2F95A86 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -170,6 +216,9 @@
 				84B9B0A41D8AFBC80014893C /* SettingsCellText.xib */,
 				84B9B0A61D8AFBD30014893C /* SettingsCellRegular.xib */,
 				84BA00BD1D58BFDA007AED50 /* AddPostViewController.swift */,
+				84D297CA1D9177E700C4F412 /* ChatViewController.swift */,
+				84D297CC1D9190D000C4F412 /* ChatsListViewController.swift */,
+				84D297CE1D9199DA00C4F412 /* ChatListCell.xib */,
 				84B4C3021D26B0DD0001A05A /* General.swift */,
 				84BF988A1D1C1FAB0031A13D /* FilterCellTimeframe.xib */,
 				84BF988C1D1C1FB50031A13D /* FilterCellTimeframePicker.xib */,
@@ -225,9 +274,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84D8D98D1D0EE93A006C7A62 /* Build configuration list for PBXNativeTarget "Redity" */;
 			buildPhases = (
+				C97E430E243E4891B85574B5 /* [CP] Check Pods Manifest.lock */,
 				84D8D9611D0EE939006C7A62 /* Sources */,
 				84D8D9621D0EE939006C7A62 /* Frameworks */,
 				84D8D9631D0EE939006C7A62 /* Resources */,
+				9394601F54114B2D223DE07B /* [CP] Embed Pods Frameworks */,
+				F36A1A05D7261B4094FB0E4E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -242,9 +294,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84D8D9901D0EE93A006C7A62 /* Build configuration list for PBXNativeTarget "RedityTests" */;
 			buildPhases = (
+				EA74D84C91220F869A1C6FE5 /* [CP] Check Pods Manifest.lock */,
 				84D8D9751D0EE93A006C7A62 /* Sources */,
 				84D8D9761D0EE93A006C7A62 /* Frameworks */,
 				84D8D9771D0EE93A006C7A62 /* Resources */,
+				3710F8AAF74B80B12C405E59 /* [CP] Embed Pods Frameworks */,
+				04A39981AED38A6B0FFE5312 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -260,9 +315,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84D8D9931D0EE93A006C7A62 /* Build configuration list for PBXNativeTarget "RedityUITests" */;
 			buildPhases = (
+				CD5F495F9F0FCC83C098E0A1 /* [CP] Check Pods Manifest.lock */,
 				84D8D9801D0EE93A006C7A62 /* Sources */,
 				84D8D9811D0EE93A006C7A62 /* Frameworks */,
 				84D8D9821D0EE93A006C7A62 /* Resources */,
+				C373550554351CB91BC84AD4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -339,6 +396,7 @@
 				84C145941D1ABC77002CFF88 /* SF-UI-Text-Medium.ttf in Resources */,
 				84B9B0A71D8AFBD30014893C /* SettingsCellRegular.xib in Resources */,
 				84C22BBC1D48E22F00EB231F /* geo_pins_data1.json in Resources */,
+				84D297CF1D9199DA00C4F412 /* ChatListCell.xib in Resources */,
 				84C1459E1D1AEE66002CFF88 /* FilterTextCell.xib in Resources */,
 				84BF988B1D1C1FAB0031A13D /* FilterCellTimeframe.xib in Resources */,
 				84D8D96E1D0EE93A006C7A62 /* Main.storyboard in Resources */,
@@ -365,6 +423,129 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		04A39981AED38A6B0FFE5312 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RedityTests/Pods-RedityTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3710F8AAF74B80B12C405E59 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RedityTests/Pods-RedityTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9394601F54114B2D223DE07B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Redity/Pods-Redity-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C373550554351CB91BC84AD4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RedityUITests/Pods-RedityUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C97E430E243E4891B85574B5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		CD5F495F9F0FCC83C098E0A1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		EA74D84C91220F869A1C6FE5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		F36A1A05D7261B4094FB0E4E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Redity/Pods-Redity-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		84D8D9611D0EE939006C7A62 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -379,8 +560,10 @@
 				84C1459C1D1AED5D002CFF88 /* MyTableCells.swift in Sources */,
 				84B460B71D32302700CCEBEB /* PlacesViewController.swift in Sources */,
 				84BA00BE1D58BFDA007AED50 /* AddPostViewController.swift in Sources */,
+				84D297CB1D9177E700C4F412 /* ChatViewController.swift in Sources */,
 				84D8D9691D0EE93A006C7A62 /* AppDelegate.swift in Sources */,
 				84C8B0B81D25640300BD6B62 /* OnePostViewController.swift in Sources */,
+				84D297CD1D9190D000C4F412 /* ChatsListViewController.swift in Sources */,
 				84C110741D294197009067FE /* MapViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -521,6 +704,7 @@
 		};
 		84D8D98E1D0EE93A006C7A62 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 194205D9001E99A6C78EB545 /* Pods-Redity.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Redity/Info.plist;
@@ -533,6 +717,7 @@
 		};
 		84D8D98F1D0EE93A006C7A62 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3F02291EDE6D72583309CFD3 /* Pods-Redity.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Redity/Info.plist;
@@ -545,6 +730,7 @@
 		};
 		84D8D9911D0EE93A006C7A62 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E87243D858ED390B417DA5F4 /* Pods-RedityTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = RedityTests/Info.plist;
@@ -557,6 +743,7 @@
 		};
 		84D8D9921D0EE93A006C7A62 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 46969F455142BE84B9A5E741 /* Pods-RedityTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				INFOPLIST_FILE = RedityTests/Info.plist;
@@ -569,6 +756,7 @@
 		};
 		84D8D9941D0EE93A006C7A62 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E38E077D42849E2710AA7F89 /* Pods-RedityUITests.debug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = RedityUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -581,6 +769,7 @@
 		};
 		84D8D9951D0EE93A006C7A62 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9650455DF843788A29A1EA9F /* Pods-RedityUITests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = RedityUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

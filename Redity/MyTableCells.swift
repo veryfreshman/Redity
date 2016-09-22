@@ -1233,3 +1233,19 @@ class FilterCellTimeframePicker:UITableViewCell {
     }
     
 }
+
+class ChatListCell : UITableViewCell {
+    
+    @IBOutlet var avatar_image:UIImageView!
+    @IBOutlet var chat_text:UILabel!
+    @IBOutlet var unread_mark:UIView!
+    
+    func setMessageRead(read:Bool) {
+        unread_mark.hidden = read
+    }
+    
+    func setChatText(text:NSAttributedString) {
+        chat_text.attributedText = text
+    }
+    
+}

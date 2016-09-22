@@ -186,7 +186,7 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     }
     
     func cardReplyPressed(cardId:Int) {
-        
+        main_vc.cardReplyPressed(cardId)
     }
     
     func cardSharePressed(sender:Int) {

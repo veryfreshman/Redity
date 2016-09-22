@@ -13,15 +13,19 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
     let PRICE_PRO:Double = 1.99
     let CELL_REGULAR_HEIGHT:CGFloat = 45
     let CELL_BIG_HEIGHT:CGFloat = 70
+    let SETTINGS_TABLE_TEXT_COLOR:UIColor = UIColor(red: 40/255, green: 40/255, blue: 40/255, alpha: 1.0)
     
     var main_vc:MainViewController!
     var posts_viewer_vc:PostsViewerViewController!
+    var chats_list_vc:ChatsListViewController!
     
     init(mainVC:MainViewController) {
         super.init()
         main_vc = mainVC
         posts_viewer_vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("posts_viewer_vc") as! PostsViewerViewController
         posts_viewer_vc.preConfigureWithNavBarHeight(65, mainVC: main_vc)
+        chats_list_vc = main_vc.storyboard!.instantiateViewControllerWithIdentifier("chats_list_vc") as! ChatsListViewController
+        chats_list_vc.setMainVc(main_vc)
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -29,19 +33,31 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
+        return NSUserDefaults().boolForKey("pro_version") ? 6 : 8
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        switch indexPath.row {
+        var row_use = indexPath.row
+        if NSUserDefaults().boolForKey("pro_version") && indexPath.row > 2 {
+            row_use += 2
+        }
+        switch row_use {
         case 0...3:
             let cell = tableView.dequeueReusableCellWithIdentifier("settings_cell_big") as! SettingsCellBig
             var title_head = "", title_description = ""
-            switch indexPath.row {
+            var red_description_text = false
+            switch row_use {
             case 0:
-                let total_chats = NSUserDefaults().integerForKey("chats_total")
                 title_head = "Chats"
-                title_description = "\(total_chats) total"
+                let total_chats = NSUserDefaults().integerForKey("chats_total")
+                let unread_chats = NSUserDefaults().integerForKey("unread_chats_total")
+                if unread_chats > 0 {
+                    title_description = "\(unread_chats) unread"
+                    red_description_text = true
+                }
+                else {
+                    title_description = "\(total_chats) total"
+                }
             case 1:
                 let total_saved = (NSUserDefaults().arrayForKey("cards_bookmarks") as! [Int]).count
                 title_head = "Saved posts"
@@ -58,6 +74,7 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
             }
             cell.title_head.text = title_head
             cell.title_description.text = title_description
+            cell.title_description.textColor = red_description_text ? UIColor.redColor() : SETTINGS_TABLE_TEXT_COLOR
             cell.icon_image.image = UIImage(named: "settings_icon_\(indexPath.row)")!
             return cell
         case 4:
@@ -67,7 +84,7 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
         case 5...7:
             let cell = tableView.dequeueReusableCellWithIdentifier("settings_cell_regular") as! SettingsCellRegular
             var title = ""
-            switch indexPath.row {
+            switch row_use {
             case 5:
                 title = "Notifications on"
                 cell.switch_control.selected = NSUserDefaults().boolForKey("settings_notifications")
@@ -93,7 +110,11 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        switch indexPath.row {
+        var row_use = indexPath.row
+        if NSUserDefaults().boolForKey("pro_version") && indexPath.row > 2 {
+            row_use += 2
+        }
+        switch row_use {
         case 0...3:
             return CELL_BIG_HEIGHT
         case 4:
@@ -109,9 +130,13 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
-        switch indexPath.row {
+        var row_use = indexPath.row
+        if NSUserDefaults().boolForKey("pro_version") && indexPath.row > 2 {
+            row_use += 2
+        }
+        switch row_use {
         case 0:
-            print("opening chats...")
+            main_vc.navigationController!.pushViewController(chats_list_vc, animated: true)
         case 1:
             posts_viewer_vc.configureWithPostsType("saved")
             main_vc.navigationController!.pushViewController(posts_viewer_vc, animated: true)
@@ -130,7 +155,7 @@ class SettingsTabHolder: NSObject, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.row == 4 {
+        if indexPath.row == 4 && !NSUserDefaults().boolForKey("pro_version") {
             cell.backgroundColor = UIColor.clearColor()
         }
         else {

@@ -74,6 +74,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let FEED_EMPTY_ICON_WIDTH_RELATIVE:CGFloat = 0.515
     let FEED_EMPTY_LABEL_TEXT_SIZE:CGFloat = 20
     let FEED_EMPTY_LABEL_MARGIN_TOP:CGFloat = 27
+    let SETTINGS_TABLE_TEXT_COLOR:UIColor = UIColor(red: 40/255, green: 40/255, blue: 40/255, alpha: 1.0)
     
     let PAN_MAP_GESTURE_BEGIN_ZONE_END_RELATIVE:CGFloat = 0.35 //part of screen's width. if gesture started after it, it won't be considered as the beginning of map view appearance
     let PAN_MAP_GESTURE_MIN_TRANSLATE_RELATIVE:CGFloat = 0.35 // min distance you must move you finger along the screen in order for map view to appear
@@ -111,6 +112,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let ANIMATION_CELL_BLINK_DURATION:CFTimeInterval = 0.4
     let CELL_COLOR_BLINK:UIColor = UIColor.yellowColor()
     let ANIMATION_CELL_BLINK_ON_DELAY:CFTimeInterval = 0.2
+    let SWITCH_ON_TINT_COLOR:UIColor = UIColor(red: 73/255, green: 65/255, blue: 149/255, alpha: 1.0)
     
     var posts_vc:PostsViewerViewController!
     var settings_table_protocol:SettingsTabHolder!
@@ -734,15 +736,20 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             //shoul set laoding, now setting ok
             feed_state = "ok"
         }
-        let mapping_result = setupCurrentSectionMappingByAppendingCards(cards_ids_add,withUpdatingTable: true)
-        let inserted_count = mapping_result.insertSections.count
+        setupCurrentSectionMappingByAppendingCards(cards_ids_add,withUpdatingTable: true)
+        //let inserted_count = mapping_result.insertSections.count
         //updateFeedFooter()
-        print("was inserted \(inserted_count)")
+        //print("was inserted \(inserted_count)")
     }
     
     //if we call it with nil, then only specified cards will be appended and updated - should use it when loading new content
     //otherwise updating all the data - when filter changed, for example
+    
+    /*
     func setupCurrentSectionMappingByAppendingCards(cardsIds:[Int]?,withUpdatingTable:Bool) -> (insertSections:[Int], deleteSections:[Int], updateSections:[Int]) {
+
+*/
+    func setupCurrentSectionMappingByAppendingCards(cardsIds:[Int]?,withUpdatingTable:Bool) -> [Int] {
         var feed_data_keys:[Int] = []
         let prev_section_mapping = NSDictionary(dictionary: feed_section_to_card_id)
         var prev_last_section_id = -1
@@ -759,6 +766,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         feed_data_keys = feed_data_keys.sort({$0 > $1})
         let shown_cards_ids:[Int] = (current_feed_cells_data as! NSDictionary).allKeys as! [Int]
+        var blocked_cards_ids:[Int] = [] //we'll use it for hiding blocked pins from map in setpinsdata
         //print("beginning section mapping \(feed_section_to_card_id)")
         for feed_data_key in feed_data_keys {
             //checking some required filters...
@@ -768,9 +776,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let p2 = current_feed_cells_data[feed_data_key]!["person_2"] as! String
                 let gender_type = p1 + p2
                 if !(current_filter_data["gender"]![gender_type] as! Bool) {
+                    blocked_cards_ids.append(feed_data_key)
                     continue
                 }
                 if !(current_filter_data["include_transport"] as! Bool) && current_feed_cells_data[feed_data_key]!["transport_icon_present"] as! Bool {
+                    blocked_cards_ids.append(feed_data_key)
                     continue
                 }
                 let shown_areas = current_filter_data["shown_areas"] as! [NSDictionary]
@@ -778,12 +788,14 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     if !(shown_area["checked"] as! Bool) {
                         let switched_off_area_id = shown_area["areaId"] as! Int
                         if General.areaId(switched_off_area_id, hasChildAreaId: current_area_id) {
+                            blocked_cards_ids.append(feed_data_key)
                             continue
                         }
                     }
                 }
                 if current_filter_data["include_nearby"] as! Bool {
                     if !nearby_areas_ids.contains(current_area_id) {
+                        blocked_cards_ids.append(feed_data_key)
                         continue
                     }
                 }
@@ -793,6 +805,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let start_comp = current_date.compare(filter_start_date)
                 let end_comp = current_date.compare(filter_end_date)
                 if !((start_comp == NSComparisonResult.OrderedDescending || start_comp == NSComparisonResult.OrderedSame) && (end_comp == NSComparisonResult.OrderedAscending || end_comp == NSComparisonResult.OrderedSame)) {
+                    blocked_cards_ids.append(feed_data_key)
                     continue
                 }
             }
@@ -871,7 +884,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
 */
         updateFeedFooter()
-        return (insertSections,deleteSections,updateSections)
+        //return (insertSections,deleteSections,updateSections)
+        return blocked_cards_ids
     }
     
     func setupSettingsView() {
@@ -1281,7 +1295,59 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func cardReplyPressed(cardId:Int) {
-        
+        let docs_url = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
+        if let docs = docs_url {
+            var should_update_chats_list = false, should_mark_read = false
+            let chats_archive_path = docs.URLByAppendingPathComponent("chats.arch").path!
+            var chats_archive = NSKeyedUnarchiver.unarchiveObjectWithFile(chats_archive_path) as! NSArray
+            let chats_data = NSMutableArray(array: chats_archive)
+            var chatIndex = -1
+            var chat_show:NSMutableDictionary!
+            for (var i = 0;i < chats_data.count;i++) {
+                if chats_data[i]["cardId"] as! Int == cardId {
+                    chatIndex = i
+                    chat_show = NSMutableDictionary(dictionary: chats_data[i] as! NSDictionary)
+                    if chat_show["unread"] as! Bool {
+                        should_mark_read = true
+                    }
+                    break
+                }
+            }
+            if should_mark_read {
+                chat_show["unread"] = false
+                let new_chats_archive = NSMutableArray(array: chats_archive)
+                new_chats_archive[chatIndex] = chat_show
+                NSKeyedArchiver.archivedDataWithRootObject(new_chats_archive).writeToFile(chats_archive_path, atomically: false)
+                let unread_chats_amount = NSUserDefaults().integerForKey("unread_chats_total") - 1
+                NSUserDefaults().setInteger(unread_chats_amount, forKey: "unread_chats_total")
+                updateSettingsTableNumbers()
+            }
+            if chatIndex == -1 {
+                chatIndex = 0
+                let new_chat = NSMutableDictionary()
+                new_chat["adding_date"] = NSDate()
+                new_chat["cardId"] = cardId
+                let title_text = current_feed_cells_data[cardId]?["nick"] as? String
+                new_chat["nick"] = title_text
+                new_chat["cardTitle"] = current_feed_cells_data[cardId]?["title_text"] as? String
+                if title_text == nil {
+                    print("FATAl: No data for this card id. Time to build REAL system for retrieveing cards")
+                    return
+                }
+                new_chat["unread"] = false
+                let messages = NSArray()
+                new_chat["messages"] = messages
+                chats_data.addObject(new_chat)
+                NSKeyedArchiver.archivedDataWithRootObject(chats_data).writeToFile(chats_archive_path, atomically: false)
+                NSUserDefaults().setInteger(chats_data.count, forKey: "chats_total")
+                updateSettingsTableNumbers()
+                chat_show = NSMutableDictionary(dictionary: new_chat)
+            }
+            settings_table_protocol.chats_list_vc.prepareChatsListWithReloading(false)
+            let chat_vc = ChatViewController()
+            chat_vc.prepareMessagesWithChat(chat_show, myAvatarBgColor: General.my_avatar_bg_color, companionAvatarBgColor: settings_table_protocol.chats_list_vc.avatars_colors[cardId]!, chatsListVc: settings_table_protocol.chats_list_vc)
+            navigationController!.pushViewController(chat_vc, animated: true)
+        }
     }
     
     func cardSharePressed(cardId:Int) {
@@ -1417,6 +1483,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func dateChangedWithValue(date:NSDate) {
+        let addon = (NSUserDefaults().boolForKey("pro_version") ? 0 : 1)
         let editingDateId = current_filter_heads_info[2]["editingDateId"] as! Int
         let mutable_dates = NSMutableDictionary(dictionary: current_filter_data["timeframe"] as! NSDictionary)
         if editingDateId == 0 {
@@ -1438,7 +1505,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             cell.descriptionLabel.text = text_right
         }
-        let cell_now_date = filter_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: (editingDateId + 1), inSection: 2)) as? FilterCellTimeframe
+        let cell_now_date = filter_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: (editingDateId + 1 + addon), inSection: 2)) as? FilterCellTimeframe
         if let cell = cell_now_date {
             cell.dateLabel.text = editingDateId == 0 ? current_start_date_string : current_end_date_string
         }
@@ -1562,45 +1629,64 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 }
                 return ret_cell
             case 2:
-                if indexPath.row > 2 {
-                    var ret_cell:FilterCellTimeframePicker
-                    if let deq_cell = tableView.dequeueReusableCellWithIdentifier("filter_cell_timeframe_picker") as? FilterCellTimeframePicker {
-                        ret_cell = deq_cell
+                let pro_version = NSUserDefaults().boolForKey("pro_version")
+                let row_use = indexPath.row - (pro_version ? 0 : 1)
+                if !pro_version && indexPath.row == 1 {
+                    var pro_version_cell = tableView.dequeueReusableCellWithIdentifier("pro_version_cell")
+                    if pro_version_cell == nil {
+                        pro_version_cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "pro_version_cell")
                     }
-                    else {
-                        ret_cell = FilterCellTimeframePicker()
-                    }
-                    ret_cell.setDateChangedHandler(dateChangedWithValue)
-                    ret_cell.datePicker.minimumDate = min_possible_date
-                    ret_cell.datePicker.maximumDate = max_possible_date
-                    ret_cell.datePicker.date = current_filter_heads_info[2]["editingDateId"] as! Int == 0 ? current_filter_data["timeframe"]!["start_date"] as! NSDate : current_filter_data["timeframe"]!["end_date"] as! NSDate
-                    return ret_cell
+                    let pro_version_switch = UISwitch()
+                    pro_version_switch.setOn(true, animated: false)
+                    pro_version_switch.onTintColor = SWITCH_ON_TINT_COLOR
+                    pro_version_switch.addTarget(self, action: "proVersionSwitchChanged:", forControlEvents: .ValueChanged)
+                    pro_version_cell!.textLabel!.text = "Limit to 45 days"
+                    pro_version_cell!.textLabel!.font = UIFont(name: "SFUIText-Medium", size: 17)!
+                    pro_version_cell!.textLabel!.textColor = UIColor(red: 74/255, green: 85/255, blue: 109/255, alpha: 1.0)
+                    pro_version_cell!.accessoryView = pro_version_switch
+                    return pro_version_cell!
                 }
                 else {
-                    var ret_cell:FilterCellTimeframe
-                    if let deq_cell = tableView.dequeueReusableCellWithIdentifier("filter_cell_timeframe") as? FilterCellTimeframe {
-                        ret_cell = deq_cell
+                    if row_use > 2 {
+                        var ret_cell:FilterCellTimeframePicker
+                        if let deq_cell = tableView.dequeueReusableCellWithIdentifier("filter_cell_timeframe_picker") as? FilterCellTimeframePicker {
+                            ret_cell = deq_cell
+                        }
+                        else {
+                            ret_cell = FilterCellTimeframePicker()
+                        }
+                        ret_cell.setDateChangedHandler(dateChangedWithValue)
+                        ret_cell.datePicker.minimumDate = min_possible_date
+                        ret_cell.datePicker.maximumDate = max_possible_date
+                        ret_cell.datePicker.date = current_filter_heads_info[2]["editingDateId"] as! Int == 0 ? current_filter_data["timeframe"]!["start_date"] as! NSDate : current_filter_data["timeframe"]!["end_date"] as! NSDate
+                        return ret_cell
                     }
                     else {
-                        ret_cell = FilterCellTimeframe()
-                    }
-                    ret_cell.titleLabel.text = indexPath.row == 1 ? "Since" : "To"
-                    if current_filter_heads_info[2]["nowDateEditing"] as! Bool {
-                        if current_filter_heads_info[2]["editingDateId"] as! Int == indexPath.row - 1 {
-                            ret_cell.backgroundColor = FILTER_TIMEFRAME_SELECTED_BG
-                            ret_cell.dateLabel.textColor = FILTER_TIMEFRAME_SELECTED_DATE_LABEL_BG
+                        var ret_cell:FilterCellTimeframe
+                        if let deq_cell = tableView.dequeueReusableCellWithIdentifier("filter_cell_timeframe") as? FilterCellTimeframe {
+                            ret_cell = deq_cell
+                        }
+                        else {
+                            ret_cell = FilterCellTimeframe()
+                        }
+                        ret_cell.titleLabel.text = row_use == 1 ? "Since" : "To"
+                        if current_filter_heads_info[2]["nowDateEditing"] as! Bool {
+                            if current_filter_heads_info[2]["editingDateId"] as! Int == row_use - 1 {
+                                ret_cell.backgroundColor = FILTER_TIMEFRAME_SELECTED_BG
+                                ret_cell.dateLabel.textColor = FILTER_TIMEFRAME_SELECTED_DATE_LABEL_BG
+                            }
+                            else {
+                                ret_cell.backgroundColor = UIColor.whiteColor()
+                                ret_cell.dateLabel.textColor = FILTER_TIMEFRAME_UNSELECTED_DATE_LABEL_BG
+                            }
                         }
                         else {
                             ret_cell.backgroundColor = UIColor.whiteColor()
                             ret_cell.dateLabel.textColor = FILTER_TIMEFRAME_UNSELECTED_DATE_LABEL_BG
                         }
+                        ret_cell.dateLabel.text = (row_use - 1) == 0 ? current_start_date_string : current_end_date_string
+                        return ret_cell
                     }
-                    else {
-                        ret_cell.backgroundColor = UIColor.whiteColor()
-                        ret_cell.dateLabel.textColor = FILTER_TIMEFRAME_UNSELECTED_DATE_LABEL_BG
-                    }
-                    ret_cell.dateLabel.text = (indexPath.row - 1) == 0 ? current_start_date_string : current_end_date_string
-                    return ret_cell
                 }
             case 3:
                 var ret_cell = tableView.dequeueReusableCellWithIdentifier("cell_nearby_detail")
@@ -1713,10 +1799,14 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                         case 1:
                             indices_to_delete.append(NSIndexPath(forRow: 1, inSection: 1))
                         case 2:
-                            indices_to_delete.append(NSIndexPath(forRow: 1, inSection: 2))
-                            indices_to_delete.append(NSIndexPath(forRow: 2, inSection: 2))
+                            let addon = (NSUserDefaults().boolForKey("pro_version") ? 0 : 1)
+                            if addon == 1 {
+                                indices_to_delete.append(NSIndexPath(forRow: 1, inSection: 2))
+                            }
+                            indices_to_delete.append(NSIndexPath(forRow: 1 + addon, inSection: 2))
+                            indices_to_delete.append(NSIndexPath(forRow: 2 + addon, inSection: 2))
                             if current_filter_heads_info[indexPath.section]["nowDateEditing"] as! Bool {
-                                indices_to_delete.append(NSIndexPath(forRow: 3, inSection: 2))
+                                indices_to_delete.append(NSIndexPath(forRow: 3 + addon, inSection: 2))
                                 current_filter_heads_info[indexPath.section]["nowDateEditing"] = false
                             }
                         default:
@@ -1736,6 +1826,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                         case 2:
                             indices_to_insert.append(NSIndexPath(forRow: 1, inSection: 2))
                             indices_to_insert.append(NSIndexPath(forRow: 2, inSection: 2))
+                            if !NSUserDefaults().boolForKey("pro_version") {
+                                indices_to_insert.append(NSIndexPath(forRow: 3, inSection: 2))
+                            }
                         default:
                             break
                         }
@@ -1825,25 +1918,29 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                         head_cell_change.descriptionLabel.text = current_filter_heads_info[0]["text_right"] as? String
                     }
                 case 2:
+                    let addon = (NSUserDefaults().boolForKey("pro_version") ? 0 : 1)
+                    let row_use = indexPath.row - addon
+                    if addon == 1 && indexPath.row == 1 {
+                        break
+                    }
                     if current_filter_heads_info[2]["nowDateEditing"] as! Bool {
-                        if indexPath.row - 1 == current_filter_heads_info[2]["editingDateId"] as! Int {
+                        if row_use - 1 == current_filter_heads_info[2]["editingDateId"] as! Int {
                             current_filter_heads_info[2]["nowDateEditing"] = false
-                            tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 3, inSection: 2)], withRowAnimation: .Fade)
+                            tableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: 3 + addon, inSection: 2)], withRowAnimation: .Fade)
                         }
                         else {
-                            current_filter_heads_info[2]["editingDateId"] = indexPath.row - 1
-                            tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 3, inSection: 2)], withRowAnimation: .Fade)
+                            current_filter_heads_info[2]["editingDateId"] = row_use - 1
+                            tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 3 + addon, inSection: 2)], withRowAnimation: .Fade)
                         }
                     }
                     else {
                         current_filter_heads_info[2]["nowDateEditing"] = true
-                        current_filter_heads_info[2]["editingDateId"] = indexPath.row - 1
-                        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: 3, inSection: 2)], withRowAnimation: .Fade)
+                        current_filter_heads_info[2]["editingDateId"] = row_use - 1
+                        tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: 3 + addon, inSection: 2)], withRowAnimation: .Fade)
                     }
-                    tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 1, inSection: 2),NSIndexPath(forRow: 2, inSection: 2)], withRowAnimation: .None)
+                    tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: 1 + addon, inSection: 2),NSIndexPath(forRow: 2 + addon, inSection: 2)], withRowAnimation: .None)
                 default:
                     break
-                    
                 }
             }
             if indices_to_insert.count != 0 {
@@ -1898,8 +1995,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        let addon = (NSUserDefaults().boolForKey("pro_version") ? 0 : 1)
         if tableView == filter_table_view {
-            if indexPath.section == 2 && indexPath.row == 3 {
+            if indexPath.section == 2 && indexPath.row == 3 + addon {
                 return ROW_HEIGHT_TIMEFRAME_PICKER
             }
             else if indexPath.row == 0 {
@@ -1940,6 +2038,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 if current_filter_heads_info[2]["isExpanded"] as! Bool {
                     ans += 2
                     if current_filter_heads_info[2]["nowDateEditing"] as! Bool {
+                        ans++
+                    }
+                    if !NSUserDefaults().boolForKey("pro_version") {
                         ans++
                     }
                 }
@@ -2320,7 +2421,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             add_post_vc.loc_pin_vc.selected_area_id = selected_area_id
         }
         else {
-            setBasicNavigationItemIcons()
+            if now_left_tab {
+                setBasicNavigationItemIcons()
+            }
+            else {
+                navigationItem.setRightBarButtonItem(nil, animated: true)
+            }
         }
         add_post_screen_animating = true
         UIView.animateWithDuration(ANIMATION_ADD_POST_SCALING_DURATION, animations: {
@@ -2622,16 +2728,30 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.navigationItem.setRightBarButtonItem(UIBarButtonItem(image: UIImage(named: data_filter_present ? "filter_icon_on" : "filter_icon_off")!, style: .Plain, target: self, action: "filterButtonPressed:"), animated: true)
     }
     
+    func proVersionSwitchChanged(sender:UISwitch) {
+        //should present some alert with pro announcement
+        print("presenting PRO offer...")
+        sender.setOn(true, animated: true)
+    }
+    
     func updateSettingsTableNumbers() {
         //updating only first 3 menu items
         for (var i = 0;i < 3;i++) {
             let row = NSIndexPath(forRow: i, inSection: 0)
             if let cell = settings_table_view.cellForRowAtIndexPath(row) as? SettingsCellBig {
                 var title_description = ""
+                var red_description_text = false
                 switch i {
                 case 0:
                     let total_chats = NSUserDefaults().integerForKey("chats_total")
-                    title_description = "\(total_chats) total"
+                    let unread_chats = NSUserDefaults().integerForKey("unread_chats_total")
+                    if unread_chats > 0 {
+                        title_description = "\(unread_chats) unread"
+                        red_description_text = true
+                    }
+                    else {
+                        title_description = "\(total_chats) total"
+                    }
                 case 1:
                     let total_saved = (NSUserDefaults().arrayForKey("cards_bookmarks") as! [Int]).count
                     title_description = "\(total_saved) saved"
@@ -2642,6 +2762,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     break
                 }
                 cell.title_description.text = title_description
+                cell.title_description.textColor = red_description_text ? UIColor.redColor() : SETTINGS_TABLE_TEXT_COLOR
             }
         }
     }

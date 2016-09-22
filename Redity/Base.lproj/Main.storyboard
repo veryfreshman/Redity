@@ -454,6 +454,39 @@
             </objects>
             <point key="canvasLocation" x="1966" y="2140"/>
         </scene>
+        <!--Chats List View Controller-->
+        <scene sceneID="2CS-tc-Kfh">
+            <objects>
+                <viewController storyboardIdentifier="chats_list_vc" id="KoH-EU-Wif" customClass="ChatsListViewController" customModule="Redity" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="pP7-RU-nkk"/>
+                        <viewControllerLayoutGuide type="bottom" id="SHv-tk-NY7"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="en6-rf-dWx">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s0U-nH-DJF">
+                                <rect key="frame" x="180" y="236" width="240" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="s0U-nH-DJF" firstAttribute="centerX" secondItem="en6-rf-dWx" secondAttribute="centerX" id="KVM-Tx-CXs"/>
+                            <constraint firstItem="s0U-nH-DJF" firstAttribute="centerY" secondItem="en6-rf-dWx" secondAttribute="centerY" id="KsJ-F5-VMp"/>
+                            <constraint firstItem="s0U-nH-DJF" firstAttribute="height" secondItem="en6-rf-dWx" secondAttribute="height" id="RYd-AZ-til"/>
+                            <constraint firstItem="s0U-nH-DJF" firstAttribute="width" secondItem="en6-rf-dWx" secondAttribute="width" id="mAV-0q-Uor"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bg_view" destination="s0U-nH-DJF" id="abO-6P-8Xo"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="EO3-hl-HEj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2692" y="2132"/>
+        </scene>
         <!--Pin Map View Controller-->
         <scene sceneID="qtD-vq-KXs">
             <objects>

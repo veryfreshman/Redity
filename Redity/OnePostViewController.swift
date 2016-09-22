@@ -323,11 +323,11 @@ class OnePostViewController:UIViewController, UIScrollViewDelegate, UIGestureRec
     }
     
     @IBAction func replyButtonPressed(sender:UIButton) {
-        
+        main_vc.cardReplyPressed(this_card_id)
     }
     
     @IBAction func shareButtonPressed(sender:UIButton) {
-        
+        //should get share menu from main_vc
     }
     
     @IBAction func saveButtonPressed(sender:UIButton) {
