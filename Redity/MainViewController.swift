@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  Redity
 //
-//  Created by Admin on 13.06.16.
+//  Created by Vano on 13.06.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 
@@ -75,6 +75,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let FEED_EMPTY_LABEL_TEXT_SIZE:CGFloat = 20
     let FEED_EMPTY_LABEL_MARGIN_TOP:CGFloat = 27
     let SETTINGS_TABLE_TEXT_COLOR:UIColor = UIColor(red: 40/255, green: 40/255, blue: 40/255, alpha: 1.0)
+    let CACHE_CARDS_PERIOD:NSTimeInterval = 50
     
     let PAN_MAP_GESTURE_BEGIN_ZONE_END_RELATIVE:CGFloat = 0.35 //part of screen's width. if gesture started after it, it won't be considered as the beginning of map view appearance
     let PAN_MAP_GESTURE_MIN_TRANSLATE_RELATIVE:CGFloat = 0.35 // min distance you must move you finger along the screen in order for map view to appear
@@ -169,8 +170,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     var default_filter_data:NSMutableDictionary = ["shown_areas":[["title":"Palo Alto","areaId":1,"checked":true],["title":"San Antonia","areaId":2,"checked":true],["title":"San Bernardino","areaId":3,"checked":true],["title":"Oakland","areaId":4,"checked":true]],"gender":["ww":true,"wm":true,"mm":true,"mw":true],"timeframe_unbounded":true,"timeframe":["start_date":NSCalendar.currentCalendar().startOfDayForDate(NSDate()),"end_date":NSCalendar.currentCalendar().startOfDayForDate(NSDate())],"include_nearby":false,"include_transport":true,"nearby_areas":["Las Vegas","Bakersfield","Salt Lake City"]]
     
+    var cards_data_cached:NSMutableDictionary!
+    var cards_heights_cached:NSMutableDictionary!
     var prev_filter_data:NSMutableDictionary!
     var current_filter_data:NSMutableDictionary!
+    var full_cards_ids:[Int] = []
+    var current_cards_ids:[Int] = []
     
     var current_feed_cells_data:[Int:NSMutableDictionary] = [Int:NSMutableDictionary]()
     
@@ -219,6 +224,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        prepareCachedCardsData()
         settings_table_protocol = SettingsTabHolder(mainVC:self)
         let images_sizes = [NSValue(CGSize:UIImage(named: "sample_1")!.size),NSValue(CGSize:UIImage(named: "sample_2")!.size)]
         General.precalculateMapPlaceholderWithSize(CGSizeMake(view.bounds.width * FEED_IMAGE_RIGHT_MAP_WIDTH_RELATIVE, FEED_IMAGE_RIGHT_MAP_HEIGHT))
@@ -320,7 +326,55 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         pan_map_gesture_recognizer.delegate = self
         people_tab_holder_view.addGestureRecognizer(pan_map_gesture_recognizer)
         updateLocation()
-        
+        let _ = NSTimer.scheduledTimerWithTimeInterval(CACHE_CARDS_PERIOD, target: self, selector: "cacheCardsTimer:", userInfo: nil, repeats: true)
+    }
+    
+    func cacheCardsTimer(sender:NSTimer) {
+        saveCachedCardsData()
+    }
+    
+    func saveCachedCardsData() {
+        print("saving cached cards...")
+        let doc_dir_url = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
+        if let doc_dir = doc_dir_url {
+            let cards_data_path = doc_dir.URLByAppendingPathComponent("cards_cache.arch").path!
+            let cards_data_saving = NSMutableDictionary()
+            let all_current_cards_ids = cards_data_cached.allKeys as! [Int]
+            for cardId in all_current_cards_ids {
+                if cards_data_cached[cardId]!["map_present"] as! Bool {
+                    let new_card_data = NSMutableDictionary(dictionary: cards_data_cached[cardId] as! NSDictionary)
+                    let map_coords = (cards_data_cached[cardId]!["map_coords"] as! NSValue).MKCoordinateValue
+                    new_card_data.removeObjectForKey("map_coords")
+                    new_card_data["map_lat"] = map_coords.latitude as! Double
+                    new_card_data["map_long"] = map_coords.longitude as! Double
+                    cards_data_saving[cardId] = new_card_data
+                }
+                else {
+                    cards_data_saving[cardId] = cards_data_cached[cardId] as! NSDictionary
+                }
+            }
+            NSKeyedArchiver.archivedDataWithRootObject(cards_data_saving).writeToFile(cards_data_path, atomically: false)
+        }
+    }
+    
+    func prepareCachedCardsData() {
+        let doc_dir_url = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
+        if let doc_dir = doc_dir_url {
+            let cards_data_path = doc_dir.URLByAppendingPathComponent("cards_cache.arch").path!
+            cards_data_cached = NSMutableDictionary(dictionary: NSKeyedUnarchiver.unarchiveObjectWithFile(cards_data_path) as! NSDictionary)
+        }
+        for (key,value) in cards_data_cached {
+            if value["map_present"] as! Bool {
+                let new_value = NSMutableDictionary(dictionary: value as! NSDictionary)
+                let map_lat = CLLocationDegrees(value["map_lat"] as! Double)
+                let map_long = CLLocationDegrees(value["map_long"] as! Double)
+                let map_coords_value = NSValue(MKCoordinate: CLLocationCoordinate2DMake(map_lat, map_long))
+                new_value.removeObjectForKey("map_lat")
+                new_value.removeObjectForKey("map_long")
+                new_value["map_coords"] = map_coords_value
+                cards_data_cached[key as! Int] = new_value
+            }
+        }
     }
     
     func updateLocation() {
@@ -508,62 +562,184 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         filter_view.addSubview(filter_table_view)
     }
     
-    //assigningtype = feed(for main feed) , feed_sep(for saved/my posts), one (for separate post viewing at OnePostViewController for main feed), one_sep(-//-)
-    func startLoadingImagesForCardId(cardId:Int, withAssigningType:String) {
-        var images_amount:Int = -1
-        if withAssigningType == "feed" || withAssigningType == "one" {
-            images_amount = current_feed_cells_data[cardId]!["images_count"] as! Int
+    //it only returns consistent cards, i.e.  when next cards is missed, but the card after the next is present, returning stoppes
+    func getAvailableCardsIdsAmongCardsIds(cardsIds:[Int]) -> [Int] {
+        var available_cards_ids:[Int] = []
+        var load_cards_ids:[Int] = []
+        let cached_cards_ids = cards_data_cached.allKeys as! [Int]
+        for cardId in cardsIds {
+            if cached_cards_ids.contains(cardId) {
+                available_cards_ids.append(cardId)
+            }
+            else {
+                break
+            }
+        }
+        for cardId in cardsIds {
+            if !cached_cards_ids.contains(cardId) {
+                load_cards_ids.append(cardId)
+            }
+        }
+        startLoadingCardsIds(load_cards_ids)
+        return available_cards_ids
+    }
+    
+    func startLoadingCardsIds(cardsIds:[Int]) {
+        
+    }
+    
+    //this method should check existense of this card at cache and then try loading it from the net
+    func getCardDataForCardId(cardId:Int) -> NSDictionary? {
+        //use notifications system when cards 're loaded
+        let cardData = cards_data_cached[cardId] as? NSDictionary
+        if cardData != nil {
+            return cardData!
         }
         else {
-            images_amount = posts_vc.current_posts_data[cardId]!["images_count"] as! Int
+            print("ERROR: No saved card for cardId \(cardId). Starting loading process")
+            return nil
         }
-        let data_time_begin = CACurrentMediaTime()
-        var resultImages:[UIImage] = []
-        if images_amount != 0 {
-            var images_paths:[String] = []
-            let cache_dir = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.CachesDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
-            if let cache_url = cache_dir {
-                let images_folder = cache_url.URLByAppendingPathComponent("imgs")
-                for (var i = 0;i < images_amount;i++) {
-                    let image_url = images_folder.URLByAppendingPathComponent("img_\(cardId)_\(i).jpeg")
-                    let image_string_path = image_url.path!
-                    images_paths.append(image_string_path)
+    }
+    
+    func getCardHeightForCardId(cardId:Int) -> CGFloat? {
+        var card_height = feed_cells_heights[cardId]
+        if card_height == nil {
+            calculateCardFramesWithCardId(cardId)
+            card_height = feed_cells_heights[cardId]
+            if card_height == nil {
+                //should notify when card loaded
+                return nil
+            }
+            else {
+                return card_height!
+            }
+        }
+        return card_height!
+    }
+    
+    func getCardFramesForCardId(cardId:Int) -> [String : CGRect]? {
+        var card_frame = feed_cells_frames[cardId]
+        if card_frame == nil {
+            calculateCardFramesWithCardId(cardId)
+            card_frame = feed_cells_frames[cardId]
+            if card_frame == nil {
+                //should notify
+                return nil
+            }
+            else {
+                return card_frame!
+            }
+        }
+        return card_frame!
+    }
+    
+    func updateShownCards() {
+        var prev_current_cards_ids:[Int] = []
+        prev_current_cards_ids.appendContentsOf(current_cards_ids)
+        current_cards_ids = []
+        var full_available_cards_ids = getAvailableCardsIdsAmongCardsIds(full_cards_ids)
+        full_available_cards_ids.sortInPlace({$0 > $1})
+        for fullCardId in full_available_cards_ids {
+            //checking some required filters...
+            let current_card_data = getCardDataForCardId(fullCardId)
+            let current_area_id = current_card_data!["areaId"] as! Int
+            if data_filter_present {
+                let p1 = current_card_data!["person_1"] as! String
+                let p2 = current_card_data!["person_2"] as! String
+                let gender_type = p1 + p2
+                if !(current_filter_data["gender"]![gender_type] as! Bool) {
+                    continue
+                }
+                if !(current_filter_data["include_transport"] as! Bool) && current_card_data!["transport_icon_present"] as! Bool {
+                    continue
+                }
+                let shown_areas = current_filter_data["shown_areas"] as! [NSDictionary]
+                for shown_area in shown_areas {
+                    if !(shown_area["checked"] as! Bool) {
+                        let switched_off_area_id = shown_area["areaId"] as! Int
+                        if General.areaId(switched_off_area_id, hasChildAreaId: current_area_id) {
+                            continue
+                        }
+                    }
+                }
+                if current_filter_data["include_nearby"] as! Bool {
+                    if !nearby_areas_ids.contains(current_area_id) {
+                        continue
+                    }
+                }
+                let filter_start_date = current_filter_data["timeframe"]!["start_date"] as! NSDate
+                let filter_end_date = current_filter_data["timeframe"]!["end_date"] as! NSDate
+                let current_date = current_card_data!["posting_date"] as! NSDate
+                let start_comp = current_date.compare(filter_start_date)
+                let end_comp = current_date.compare(filter_end_date)
+                /*
+                if !((start_comp == NSComparisonResult.OrderedDescending || start_comp == NSComparisonResult.OrderedSame) && (end_comp == NSComparisonResult.OrderedAscending || end_comp == NSComparisonResult.OrderedSame)) {
+                    continue
+                }
+*/
+                //date IS NOT WORKING AT THE MOMENT! UNCOMMEnt
+            }
+            if map_filter_present {
+                if !map_filtered_cards_ids.contains(fullCardId) {
+                    continue
                 }
             }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-                var started_loading = false
-                for (var i = 0; i < images_paths.count;i++) {
-                    if let img = UIImage(contentsOfFile: images_paths[i]) {
-                        resultImages.append(img)
-                    }
-                    else {
-                        //should load it from server and save to disc
-                        let img = UIImage(named: "sample_\(i + 1)")!
-                        resultImages.append(img)
-                        UIImageJPEGRepresentation(img, 0.6)?.writeToFile(images_paths[i], atomically: true)
+            current_cards_ids.append(fullCardId)
+        }
+        feed_table_view.reloadData()
+    }
+    
+    //assigningtype = feed(for main feed) , feed_sep(for saved/my posts), one (for separate post viewing at OnePostViewController for main feed), one_sep(-//-)
+    func startLoadingImagesForCardId(cardId:Int, withAssigningType:String) {
+        if let images_amount = getCardDataForCardId(cardId)?["images_count"] as? Int {
+            let data_time_begin = CACurrentMediaTime()
+            var resultImages:[UIImage] = []
+            if images_amount != 0 {
+                var images_paths:[String] = []
+                let cache_dir = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.CachesDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
+                if let cache_url = cache_dir {
+                    let images_folder = cache_url.URLByAppendingPathComponent("imgs")
+                    for (var i = 0;i < images_amount;i++) {
+                        let image_url = images_folder.URLByAppendingPathComponent("img_\(cardId)_\(i).jpeg")
+                        let image_string_path = image_url.path!
+                        images_paths.append(image_string_path)
                     }
                 }
-                if !started_loading {
-                    dispatch_async(dispatch_get_main_queue(), {
-                        if withAssigningType == "feed" {
-                            if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellImages {
-                                print("now setting images")
-                                cell.setImages(resultImages, withDelay: false)
-                            }
-                        }
-                        else if withAssigningType == "feed_sep" {
-                            if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellImages {
-                                cell.setImages(resultImages, withDelay: false)
-                            }
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+                    var started_loading = false
+                    for (var i = 0; i < images_paths.count;i++) {
+                        if let img = UIImage(contentsOfFile: images_paths[i]) {
+                            resultImages.append(img)
                         }
                         else {
-                            self.one_post_vc.setImages(resultImages)
+                            //should load it from server and save to disc
+                            let img = UIImage(named: "sample_\(i + 1)")!
+                            resultImages.append(img)
+                            UIImageJPEGRepresentation(img, 0.6)?.writeToFile(images_paths[i], atomically: true)
                         }
-                        let cons = CACurrentMediaTime() - data_time_begin
-                        print("Data time consumption is \(cons)")
-                    })
-                }
-            })
+                    }
+                    if !started_loading {
+                        dispatch_async(dispatch_get_main_queue(), {
+                            if withAssigningType == "feed" {
+                                if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellImages {
+                                    print("now setting images")
+                                    cell.setImages(resultImages, withDelay: false)
+                                }
+                            }
+                            else if withAssigningType == "feed_sep" {
+                                if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellImages {
+                                    cell.setImages(resultImages, withDelay: false)
+                                }
+                            }
+                            else {
+                                self.one_post_vc.setImages(resultImages)
+                            }
+                            let cons = CACurrentMediaTime() - data_time_begin
+                            print("Data time consumption is \(cons)")
+                        })
+                    }
+                })
+            }
         }
     }
     
@@ -680,6 +856,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func prepareNewAreaId(areaId:Int) {
         current_place_name = General.all_areas_info[selected_area_id]!["title"] as! String
         navigationItem.title = current_place_name
+        /*
         //first we should look through the already downloaded cards so that to see whether there are some appropriate cards here already
         let now_cards = (current_feed_cells_data as! NSDictionary).allKeys as! [Int]
         for now_card in now_cards {
@@ -687,22 +864,28 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 current_feed_cells_data.removeValueForKey(now_card)
             }
         }
-        feed_state = "loading"
-        setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
+*/
+        //feed_state = "loading"
+        //setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
         //updateFeedFooter()
         //some time later..
         let json_data = NSData(contentsOfFile: NSBundle.mainBundle().pathForResource("origin_data\(areaId)", ofType: "json")!)
         let json = (try? NSJSONSerialization.JSONObjectWithData(json_data!, options: [])) as! NSDictionary
         let new_data = General.generateFeedDataFromJsonData(json)
-        current_feed_cells_data = [Int:NSMutableDictionary]()
-        for new_data_key in (new_data.cells_add as! NSDictionary).allKeys as! [Int] {
-            current_feed_cells_data[new_data_key] = new_data.cells_add[new_data_key]!
+        //current_feed_cells_data = [Int:NSMutableDictionary]()
+        let cards_ids_add = (new_data.cells_add as! NSDictionary).allKeys as! [Int]
+        for new_data_key in cards_ids_add {
+            cards_data_cached[new_data_key] = new_data.cells_add[new_data_key]!
         }
+        full_cards_ids = []
+        full_cards_ids.appendContentsOf(cards_ids_add)
+        full_cards_ids.sortInPlace({$0 > $1})
         feed_state = "ok"
         if new_data.error == "end" {
             feed_state = "end"
         }
-        setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
+        updateShownCards()
+        //setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
         //updateFeedFooter()
         let pins_json_data = NSData(contentsOfFile: NSBundle.mainBundle().pathForResource("geo_pins_data\(areaId)", ofType: "json")!)
         let json_pins = (try? NSJSONSerialization.JSONObjectWithData(pins_json_data!, options: [])) as! NSDictionary
@@ -727,8 +910,10 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         //assumed now loading and processing finished - should be done on background thread
         let cards_ids_add = (cards_add as! NSDictionary).allKeys as! [Int]
         for cardIdAdd in cards_ids_add {
-            current_feed_cells_data[cardIdAdd] = cards_add[cardIdAdd]!
+            cards_data_cached[cardIdAdd] = cards_add[cardIdAdd]!
         }
+        full_cards_ids.appendContentsOf(cards_ids_add)
+        full_cards_ids.sortInPlace({$0 > $1})
         if result_error == "end" {
             feed_state = "end"
         }
@@ -736,7 +921,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             //shoul set laoding, now setting ok
             feed_state = "ok"
         }
-        setupCurrentSectionMappingByAppendingCards(cards_ids_add,withUpdatingTable: true)
+        //setupCurrentSectionMappingByAppendingCards(cards_ids_add,withUpdatingTable: true)
+        updateShownCards()
         //let inserted_count = mapping_result.insertSections.count
         //updateFeedFooter()
         //print("was inserted \(inserted_count)")
@@ -981,78 +1167,73 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func preloadMapSnapshotForCardId(cardId:Int, withStyle:String,withAssigning:Bool) {
-        let opts = MKMapSnapshotOptions()
-        var final_image_size = CGSizeZero
-        if withStyle == "feed_sep" {
-            final_image_size = posts_vc.posts_cells_frames[cardId]!["image_right"]!.size
-        }
-        else if withStyle == "feed" {
-            final_image_size = feed_cells_frames[cardId]!["image_right"]!.size
-        }
-        else {
-            final_image_size = CGSizeMake(view.bounds.width, one_post_vc.IMAGE_CENTER_MAP_HEIGHT)
-        }
-        var map_coords:CLLocationCoordinate2D!
-        if withStyle == "feed" || withStyle == "full" {
-            map_coords = (current_feed_cells_data[cardId]!["map_coords"] as! NSValue).MKCoordinateValue
-        }
-        else {
-            map_coords = (posts_vc.current_posts_data[cardId]!["map_coords"] as! NSValue).MKCoordinateValue
-        }
-        let mapPoint = MKMapPointForCoordinate(map_coords)
-        let totalWidth = MKMapPointsPerMeterAtLatitude(map_coords.latitude) * ((withStyle == "feed" || withStyle == "feed_sep") ? MAP_SNAPSHOT_METERS_PER_WIDTH_FEED : MAP_SNAPSHOT_METERS_PER_WIDTH_FULL)
-        let totalHeight = totalWidth * Double(final_image_size.height) / Double(final_image_size.width)
-        opts.mapRect = MKMapRect(origin: MKMapPoint(x: mapPoint.x - totalWidth * 0.5, y: mapPoint.y - totalHeight * 0.5), size: MKMapSizeMake(totalWidth, totalHeight))
-        opts.size = final_image_size
-        let snapshotter = MKMapSnapshotter(options: opts)
-        snapshotter.startWithCompletionHandler({
-            (snap:MKMapSnapshot?, error: NSError?) in
-            if let img = snap?.image {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-                    let finalImage = General.getGradientMapImageForSize(img.size, originalImage: img, isPlaceholder: false, withStyle: withStyle)
-                    if withAssigning {
-                        dispatch_async(dispatch_get_main_queue(), {
-                            self.assignMapImage(finalImage, withStyle: withStyle, cardId: cardId)
-                        })
-                    }
-                    if let cache_dir = try? NSFileManager.defaultManager().URLForDirectory(.CachesDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false) {
-                        let map_folder = cache_dir.URLByAppendingPathComponent("maps")
-                        let path_with_style = (withStyle == "feed" || withStyle == "feed_sep") ? "feed" : "full"
-                        let map_path = map_folder.URLByAppendingPathComponent("\(path_with_style)_\(cardId).jpeg").path!
-                        UIImageJPEGRepresentation(finalImage, 0.6)?.writeToFile(map_path, atomically: true)
-                    }
-                })
+        if let current_card_data = getCardDataForCardId(cardId) {
+            let opts = MKMapSnapshotOptions()
+            var final_image_size = CGSizeZero
+            if withStyle == "feed_sep" || withStyle == "feed" {
+                final_image_size = current_card_data["image_right"]!.size
             }
-        })
+            else {
+                final_image_size = CGSizeMake(view.bounds.width, one_post_vc.IMAGE_CENTER_MAP_HEIGHT)
+            }
+            let map_coords = (current_card_data["map_coords"] as! NSValue).MKCoordinateValue
+            let mapPoint = MKMapPointForCoordinate(map_coords)
+            let totalWidth = MKMapPointsPerMeterAtLatitude(map_coords.latitude) * ((withStyle == "feed" || withStyle == "feed_sep") ? MAP_SNAPSHOT_METERS_PER_WIDTH_FEED : MAP_SNAPSHOT_METERS_PER_WIDTH_FULL)
+            let totalHeight = totalWidth * Double(final_image_size.height) / Double(final_image_size.width)
+            opts.mapRect = MKMapRect(origin: MKMapPoint(x: mapPoint.x - totalWidth * 0.5, y: mapPoint.y - totalHeight * 0.5), size: MKMapSizeMake(totalWidth, totalHeight))
+            opts.size = final_image_size
+            let snapshotter = MKMapSnapshotter(options: opts)
+            snapshotter.startWithCompletionHandler({
+                (snap:MKMapSnapshot?, error: NSError?) in
+                if let img = snap?.image {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+                        let finalImage = General.getGradientMapImageForSize(img.size, originalImage: img, isPlaceholder: false, withStyle: withStyle)
+                        if withAssigning {
+                            dispatch_async(dispatch_get_main_queue(), {
+                                self.assignMapImage(finalImage, withStyle: withStyle, cardId: cardId)
+                            })
+                        }
+                        if let cache_dir = try? NSFileManager.defaultManager().URLForDirectory(.CachesDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false) {
+                            let map_folder = cache_dir.URLByAppendingPathComponent("maps")
+                            let path_with_style = (withStyle == "feed" || withStyle == "feed_sep") ? "feed" : "full"
+                            let map_path = map_folder.URLByAppendingPathComponent("\(path_with_style)_\(cardId).jpeg").path!
+                            UIImageJPEGRepresentation(finalImage, 0.6)?.writeToFile(map_path, atomically: true)
+                        }
+                    })
+                }
+            })
+        }
     }
     
     func assignMapImage(image:UIImage, withStyle:String, cardId:Int) {
-        if withStyle == "feed" {
-            if self.current_feed_cells_data[cardId]!["images_count"] as! Int == 0 {
-                if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellPlain {
-                    cell.setMapImage(image, withDelay: false)
+        if let current_card_data = self.getCardDataForCardId(cardId) {
+            if withStyle == "feed" {
+                if current_card_data["images_count"] as! Int == 0 {
+                    if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellPlain {
+                        cell.setMapImage(image, withDelay: false)
+                    }
+                }
+                else {
+                    if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellImages {
+                        cell.setMapImage(image, withDelay: false)
+                    }
+                }
+            }
+            else if withStyle == "feed_sep" {
+                if current_card_data["images_count"] as! Int == 0 {
+                    if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellPlain {
+                        cell.setMapImage(image, withDelay: false)
+                    }
+                }
+                else {
+                    if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellImages {
+                        cell.setMapImage(image, withDelay: false)
+                    }
                 }
             }
             else {
-                if let cell = self.feed_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.feedSectionForCardId(cardId))) as? FeedCellImages {
-                    cell.setMapImage(image, withDelay: false)
-                }
+                self.one_post_vc.setMapImageWithImage(image)
             }
-        }
-        else if withStyle == "feed_sep" {
-            if self.posts_vc.current_posts_data[cardId]!["images_count"] as! Int == 0 {
-                if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellPlain {
-                    cell.setMapImage(image, withDelay: false)
-                }
-            }
-            else {
-                if let cell = self.posts_vc.posts_table_view.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: self.posts_vc.getSectionForCardId(cardId))) as? FeedCellImages {
-                    cell.setMapImage(image, withDelay: false)
-                }
-            }
-        }
-        else {
-            self.one_post_vc.setMapImageWithImage(image)
         }
     }
     
@@ -1084,25 +1265,16 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func feedSectionForCardId(cardId:Int) -> Int {
         var section = -1
-        for (key,value) in feed_section_to_card_id {
-            if value == cardId {
-                section = key
+        for (var i = 0; i < current_cards_ids.count; i++) {
+            if current_cards_ids[i] == cardId {
+                section = i
+                break
             }
         }
         return section
     }
     
-    func mapSnapshotIdForCardId(cardId:Int) -> Int {
-        var snapId = -1
-        for (key,value) in map_snapshots_to_card_id {
-            if value == cardId {
-                snapId = key
-            }
-        }
-        return snapId
-    }
-    
-    func getCardDimensionsWithCardData(cardData:NSDictionary) -> (finalFrames:[String:CGRect],cellHeight:CGFloat) {
+    func calculateCardDimensionsWithCardData(cardData:NSDictionary) -> (finalFrames:[String:CGRect],cellHeight:CGFloat) {
         if cardData["images_present"] as! Bool {
             feed_card_estimate_images.setContent(cardData)
             feed_card_estimate_images.updateFramesWithWidth(view.bounds.width)
@@ -1120,23 +1292,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func calculateCardFramesWithCardId(no:Int) {
         let start_calc_time = CACurrentMediaTime()
         //we're taking info from cells feed, populating our estimate cell with it and wrtinig resulting frames to special aray, the same applies to heights for each row
-        let card_dimensions = getCardDimensionsWithCardData(current_feed_cells_data[no] as! NSDictionary)
-        feed_cells_frames[no] = card_dimensions.finalFrames
-        feed_cells_heights[no] = card_dimensions.cellHeight
-        /*
-        if current_feed_cells_data[no]!["images_present"] as! Bool {
-            feed_card_estimate_images.setContent(current_feed_cells_data[no]!)
-            feed_card_estimate_images.updateFramesWithWidth(view.bounds.width)
-            feed_cells_frames[no] = feed_card_estimate_images.getFinalFrames()
-            feed_cells_heights[no] = feed_cells_frames[no]!["button_reply"]!.maxY
+        if let card_data = getCardDataForCardId(no) {
+            let card_dimensions = calculateCardDimensionsWithCardData(card_data)
+            feed_cells_frames[no] = card_dimensions.finalFrames
+            feed_cells_heights[no] = card_dimensions.cellHeight
         }
-        else {
-            feed_card_estimate_plain.setContent(current_feed_cells_data[no]!)
-            feed_card_estimate_plain.updateFramesWithWidth(view.bounds.width)
-            feed_cells_frames[no] = feed_card_estimate_plain.getFinalFrames()
-            feed_cells_heights[no] = feed_cells_frames[no]!["button_reply"]!.maxY
-        }
-*/
         let cons = CACurrentMediaTime() - start_calc_time
         print("card calc took \(cons)")
     }
@@ -1197,20 +1357,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         var now_removing = false
         var cards_bookmarks = NSUserDefaults().arrayForKey("cards_bookmarks") as! [Int]
         var bookmark_icon_image_name = "bookmark_card_icon_"
-        var saved_posts_path = ""
-        var saved_dict_archive_path = ""
-        var saved_dict:NSMutableDictionary?
-        var saved_dict_archive:NSMutableDictionary?
-        let document_folder = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
-        if let document_folder_url = document_folder {
-            //saved_posts_path = (document_folder_url.URLByAppendingPathComponent("saved_posts.plist")).path!
-            //saved_dict = NSMutableDictionary(contentsOfFile: saved_posts_path)
-            
-            //print("just read saved dict")
-            //print(saved_dict!)
-            saved_dict_archive_path = document_folder_url.URLByAppendingPathComponent("saved_posts_archive.arch").path!
-            saved_dict_archive = NSKeyedUnarchiver.unarchiveObjectWithFile(saved_dict_archive_path) as? NSMutableDictionary
-        }
         if cards_bookmarks.contains(cardId) {
             now_removing = true
             var index = -1
@@ -1224,42 +1370,19 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 cards_bookmarks.removeAtIndex(index)
             }
             bookmark_icon_image_name += "off"
-            if saved_dict != nil {
-                //saved_dict?.removeObjectForKey("\(cardId)")
-            }
-            if saved_dict_archive != nil {
-                saved_dict_archive?.removeObjectForKey(cardId)
-            }
         }
         else {
             cards_bookmarks.append(cardId)
             bookmark_icon_image_name += "on"
-            if saved_dict_archive != nil {
-                //saved_dict?["\(cardId)"] = current_feed_cells_data[cardId]
-                let post_dict_for_archiving = NSMutableDictionary(dictionary: current_feed_cells_data[cardId]!)
-                if post_dict_for_archiving["map_present"] as! Bool {
-                    let map_coords = (post_dict_for_archiving["map_coords"] as! NSValue).MKCoordinateValue
-                    post_dict_for_archiving.removeObjectForKey("map_coords")
-                    post_dict_for_archiving["map_lat"] = map_coords.latitude as! Double
-                    post_dict_for_archiving["map_long"] = map_coords.longitude as! Double
-                }
-                saved_dict_archive?[cardId] = post_dict_for_archiving
-            }
-        }
-        if saved_dict_archive != nil {
-            //let ok = saved_dict?.writeToFile(saved_posts_path, atomically: false)
-            //print("saved \(ok!)")
-            let saved_dict_data = NSKeyedArchiver.archivedDataWithRootObject(saved_dict_archive!)
-            let ok_arch = saved_dict_data.writeToFile(saved_dict_archive_path, atomically: false)
-            print("archive saved \(ok_arch)")
         }
         NSUserDefaults().setObject(cards_bookmarks, forKey: "cards_bookmarks")
         let section_main = feedSectionForCardId(cardId)
         var images_present = false
-        if pressedIn == "posts_feed" && posts_vc.current_posts_data[cardId]!["images_present"] as! Bool {
+        let current_card_data = getCardDataForCardId(cardId)
+        if pressedIn == "posts_feed" && current_card_data!["images_present"] as! Bool {
             images_present = true
         }
-        if pressedIn == "main_feed" && current_feed_cells_data[cardId]!["images_present"] as! Bool {
+        if pressedIn == "main_feed" && current_card_data!["images_present"] as! Bool {
             images_present = true
         }
         if section_main != -1 {
@@ -1327,9 +1450,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let new_chat = NSMutableDictionary()
                 new_chat["adding_date"] = NSDate()
                 new_chat["cardId"] = cardId
-                let title_text = current_feed_cells_data[cardId]?["nick"] as? String
+                let title_text = getCardDataForCardId(cardId)!["nick"] as? String
                 new_chat["nick"] = title_text
-                new_chat["cardTitle"] = current_feed_cells_data[cardId]?["title_text"] as? String
+                new_chat["cardTitle"] = getCardDataForCardId(cardId)!["title_text"] as? String
                 if title_text == nil {
                     print("FATAl: No data for this card id. Time to build REAL system for retrieveing cards")
                     return
@@ -1704,20 +1827,20 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         else if tableView == feed_table_view {
             let cell_for_start = CACurrentMediaTime()
-            if current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!["images_present"] as! Bool {
+            if getCardDataForCardId(current_cards_ids[indexPath.section])!["images_present"] as! Bool {
                 let feed_cell_img = tableView.dequeueReusableCellWithIdentifier("feed_cell_images") as! FeedCellImages
-                feed_cell_img.setCardIdWithId(feed_section_to_card_id[indexPath.section]!)
+                feed_cell_img.setCardIdWithId(current_cards_ids[indexPath.section])
                 feed_cell_img.setHandlersWithMenuHandler(cardMenuPressed, replyHandler: cardReplyPressed, shareHandler: cardSharePressed)
-                feed_cell_img.setFrames(feed_cells_frames[feed_section_to_card_id[indexPath.section]!]!)
+                feed_cell_img.setFrames(getCardFramesForCardId(current_cards_ids[indexPath.section])!)
                 let cons = CACurrentMediaTime() - cell_for_start
                 print("cell for row took \(cons)")
                 return feed_cell_img
             }
             else {
                 let feed_cell = tableView.dequeueReusableCellWithIdentifier("feed_cell") as! FeedCellPlain
-                feed_cell.setCardIdWithId(feed_section_to_card_id[indexPath.section]!)
+                feed_cell.setCardIdWithId(current_cards_ids[indexPath.section])
                 feed_cell.setHandlersWithMenuHandler(cardMenuPressed, replyHandler: cardReplyPressed, shareHandler: cardSharePressed)
-                feed_cell.setFrames(feed_cells_frames[feed_section_to_card_id[indexPath.section]!]!)
+                feed_cell.setFrames(getCardFramesForCardId(current_cards_ids[indexPath.section])!)
                 let cons = CACurrentMediaTime() - cell_for_start
                 print("cell for row took \(cons)")
                 return feed_cell
@@ -1751,30 +1874,18 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         else if tableView == feed_table_view {
             let will_start = CACurrentMediaTime()
-            if current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!["images_present"] as! Bool {
-                (cell as! FeedCellImages).setContent(current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!)
-                startLoadingImagesForCardId(feed_section_to_card_id[indexPath.section]!, withAssigningType: "feed")
-                if current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!["map_present"] as! Bool {
-                    if let map_img = card_id_to_map_snapshot_image[feed_section_to_card_id[indexPath.section]!] {
-                        (cell as! FeedCellImages).setMapImage(map_img, withDelay: false)
-                    }
-                    else {
-                        startLoadingMapSnapshotForCardId(feed_section_to_card_id[indexPath.section]!, withStyle: "feed", withAssigning: true)
-                    }
+            if getCardDataForCardId(current_cards_ids[indexPath.section])!["images_present"] as! Bool {
+                (cell as! FeedCellImages).setContent(getCardDataForCardId(current_cards_ids[indexPath.section])!)
+                startLoadingImagesForCardId(current_cards_ids[indexPath.section], withAssigningType: "feed")
+                if getCardDataForCardId(current_cards_ids[indexPath.section])!["map_present"] as! Bool {
+                    startLoadingMapSnapshotForCardId(current_cards_ids[indexPath.section], withStyle: "feed", withAssigning: true)
                 }
             }
             else {
-                (cell as! FeedCellPlain).setContent(current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!)
-                if current_feed_cells_data[feed_section_to_card_id[indexPath.section]!]!["map_present"] as! Bool {
-                    if let map_img = card_id_to_map_snapshot_image[feed_section_to_card_id[indexPath.section]!] {
-                        (cell as! FeedCellPlain).setMapImage(map_img, withDelay: false)
-                        
-                    }
-                    else {
-                        startLoadingMapSnapshotForCardId(feed_section_to_card_id[indexPath.section]!, withStyle: "feed", withAssigning: true)
-                    }
+                (cell as! FeedCellPlain).setContent(getCardDataForCardId(current_cards_ids[indexPath.section])!)
+                if getCardDataForCardId(current_cards_ids[indexPath.section])!["map_present"] as! Bool {
+                    startLoadingMapSnapshotForCardId(current_cards_ids[indexPath.section], withStyle: "feed", withAssigning: true)
                 }
-
             }
             let cons = CACurrentMediaTime() - will_start
             print("will display took \(cons)")
@@ -1951,33 +2062,32 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
         else if tableView == feed_table_view {
-            let cardId = feed_section_to_card_id[indexPath.section]!
+            let cardId = current_cards_ids[indexPath.section]
             openOnePostWithCardId(cardId,pressedIn: "main_feed")
         }
     }
     
     func openOnePostWithCardId(cardId:Int,pressedIn:String) {
-        one_post_vc.setCardIdWithId(cardId)
-        one_post_vc.pressed_in = pressedIn
-        if pressedIn == "main_feed" {
-            if current_feed_cells_data[cardId]!["images_present"] as! Bool {
+        if let this_card_data = getCardDataForCardId(cardId) {
+            one_post_vc.setCardIdWithId(cardId)
+            one_post_vc.pressed_in = pressedIn
+            if this_card_data["images_present"] as! Bool {
                 startLoadingImagesForCardId(cardId, withAssigningType: "one")
             }
-            one_post_vc.setContent(current_feed_cells_data[cardId]!)
-            if current_feed_cells_data[cardId]!["map_present"] as! Bool {
+            one_post_vc.setContent(this_card_data)
+            if this_card_data["map_present"] as! Bool {
                 startLoadingMapSnapshotForCardId(cardId, withStyle: "full", withAssigning: true)
             }
         }
         else {
-            if posts_vc.current_posts_data[cardId]!["images_present"] as! Bool {
-                startLoadingImagesForCardId(cardId, withAssigningType: "one_sep")
-            }
-            one_post_vc.setContent(posts_vc.current_posts_data[cardId]!)
-            if posts_vc.current_posts_data[cardId]!["map_present"] as! Bool {
-                startLoadingMapSnapshotForCardId(cardId, withStyle: "full", withAssigning: true)
-            }
+            one_post_vc.setLoading()
         }
-        self.navigationController!.pushViewController(one_post_vc, animated: true)
+        if navigationController!.viewControllers.contains(one_post_vc) {
+            navigationController!.popToViewController(one_post_vc, animated: true)
+        }
+        else {
+            self.navigationController!.pushViewController(one_post_vc, animated: true)
+        }
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -1988,7 +2098,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         if let feed_compare = feed_table_view {
             if tableView == feed_compare {
-                return (feed_section_to_card_id as! NSDictionary).allKeys.count
+                return current_cards_ids.count
             }
         }
         return 1
@@ -2014,7 +2124,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
         }
         else if tableView == feed_table_view {
-            return feed_cells_heights[feed_section_to_card_id[indexPath.section]!]!
+            //print("receiving height for feed row \(indexPath.section)")
+            return getCardHeightForCardId(current_cards_ids[indexPath.section])!
         }
         else {
             return 20
@@ -2232,7 +2343,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             data_filter_present = false
         }
         if changed {
-            let feed_table_changes = setupCurrentSectionMappingByAppendingCards(nil,withUpdatingTable: true)
+            updateShownCards()
             checkFeedScrollingUpdating()
             //updateFeedFooter()
         }
@@ -2558,10 +2669,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func hideMapViewWithScrollingToCardId(cardId:Int?) {
         let people_tab_initial_center_x = 0.5 * view.bounds.width
-        if map_filter_present {
-            let present_cards_ids = (current_feed_cells_data as! NSDictionary).allKeys as! [Int]
-            //now we neeed to load cards if we do not have enough
-        }
         UIView.animateWithDuration(MAP_SHOW_HIDE_ANIMATION_DURATION, animations: {
             self.map_vc.view.center.x = self.map_view_hidden_center_x
             self.people_tab_holder_view.center.x = people_tab_initial_center_x
@@ -2582,7 +2689,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.mapCalloutTappedWithCardId(card_id_scroll)
                 }
                 self.setFiltersLabelsShowing(self.map_filter_present, rightOn: self.data_filter_present)
-                self.setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
+                //self.setupCurrentSectionMappingByAppendingCards(nil, withUpdatingTable: true)
+                self.updateShownCards()
                 //self.updateFeedFooter()
         })
     }
@@ -2673,6 +2781,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func mapCalloutTappedWithCardId(cardId:Int) {
+        /*
         let section_id = feedSectionForCardId(cardId)
         if section_id != -1 {
             scrollFeedToSection(section_id,animated: true)
@@ -2699,6 +2808,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             //should start loading notes until required appears
         }
+*/
+        openOnePostWithCardId(cardId, pressedIn: "main")
     }
     
     func scrollFeedToSection(sectionId:Int,animated:Bool) {

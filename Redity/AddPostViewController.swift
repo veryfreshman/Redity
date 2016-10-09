@@ -2,7 +2,7 @@
 //  AddPostViewController.swift
 //  Redity
 //
-//  Created by Admin on 08.08.16.
+//  Created by Vano on 08.08.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

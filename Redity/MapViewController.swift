@@ -2,7 +2,7 @@
 //  MapViewController.swift
 //  Redity
 //
-//  Created by Admin on 03.07.16.
+//  Created by Vano on 03.07.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

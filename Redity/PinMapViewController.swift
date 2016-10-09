@@ -2,7 +2,7 @@
 //  PinMapViewController.swift
 //  Redity
 //
-//  Created by Admin on 16.07.16.
+//  Created by Vano on 16.07.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

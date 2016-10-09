@@ -2,7 +2,7 @@
 //  SettingsTabHolder.swift
 //  Redity
 //
-//  Created by Admin on 15.09.16.
+//  Created by Vano on 15.09.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

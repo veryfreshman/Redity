@@ -2,7 +2,7 @@
 //  PlacesViewController.swift
 //  Redity
 //
-//  Created by Admin on 10.07.16.
+//  Created by Vano on 10.07.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

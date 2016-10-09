@@ -1,0 +1,6 @@
+framework module Pods_RedityTests {
+  umbrella header "Pods-RedityTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

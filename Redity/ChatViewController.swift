@@ -2,7 +2,7 @@
 //  ChatViewController.swift
 //  Redity
 //
-//  Created by Admin on 20.09.16.
+//  Created by Vano on 20.09.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 
@@ -128,7 +128,7 @@ class ChatViewController: JSQMessagesViewController {
     }
     
     func goPostButtonPressed(sender:UIBarButtonItem) {
-        
+        chats_list_vc.main_vc.openOnePostWithCardId(cardId, pressedIn: "chat")
     }
     
 }

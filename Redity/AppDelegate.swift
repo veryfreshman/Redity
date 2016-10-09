@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Redity
 //
-//  Created by Admin on 13.06.16.
+//  Created by Vano on 13.06.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 
@@ -38,6 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let saved_archive_url = doc_dir.URLByAppendingPathComponent("saved_posts_archive.arch")
             let saved_path = saved_url.path!
             let chats_path = doc_dir.URLByAppendingPathComponent("chats.arch").path!
+            let cards_cache_path = doc_dir.URLByAppendingPathComponent("cards_cache.arch").path!
+            let cards_heights_cache = doc_dir.URLByAppendingPathComponent("cards_heights_cache.arch").path!
             let saved_dict = NSMutableDictionary()
             if !file_manager.fileExistsAtPath(saved_path) {
                 let ok = saved_dict.writeToFile(saved_url.path!, atomically: true)
@@ -49,7 +51,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let ok_arch = archive.writeToFile(saved_archive_url.path!, atomically: false)
                 print("saved archive \(ok_arch)")
             }
+            if !file_manager.fileExistsAtPath(chats_path) {
+                let chats_archive = NSMutableArray()
+                NSKeyedArchiver.archivedDataWithRootObject(chats_archive).writeToFile(chats_path, atomically: false)
+                NSUserDefaults().setInteger(0, forKey: "unread_chats_total")
+                NSUserDefaults().setInteger(0, forKey: "chats_total")
+            }
+            if !file_manager.fileExistsAtPath(cards_cache_path) {
+                let cards_cached_archive = NSMutableDictionary()
+                NSKeyedArchiver.archivedDataWithRootObject(cards_cached_archive).writeToFile(cards_cache_path, atomically: false)
+            }
+            if !file_manager.fileExistsAtPath(cards_heights_cache) {
+                let cards_heights_archive = NSMutableDictionary()
+                NSKeyedArchiver.archivedDataWithRootObject(cards_heights_archive).writeToFile(cards_heights_cache, atomically: false)
+            }
            // if !file_manager.fileExistsAtPath(chats_path) {
+            /*
             let chats_archive = NSMutableArray()
             let ch_ex_1 = NSMutableDictionary()
             ch_ex_1["adding_date"] = NSDate(timeInterval: -21000, sinceDate: NSDate()) //only use it when messages are yet to be sent
@@ -81,13 +98,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             NSUserDefaults().setInteger(unread_chats_count, forKey: "unread_chats_total")
             NSUserDefaults().setInteger(chats_archive.count, forKey: "chats_total")
+*/
           //  }
         }
         var cards_bookmarks:[Int] = []
         NSUserDefaults().registerDefaults(["prev_location_area_id":-1,"prev_location_coords":[0.0,0.0],"selected_area_id":1,"cards_bookmarks":cards_bookmarks,"my_posts_cards_ids":cards_bookmarks,"saved_total":2,"chats_total":0,"settings_notifications":false,"my_nick":"IK","unread_chats_total":0,"pro_version":false]) // no prev location is available
         //now we should preload some general info - such as all_areas_cell_data
-        //var my:[Int] = []
-        //NSUserDefaults().setObject(my, forKey: "my_posts_cards_ids")
+        var my:[Int] = []
+        NSUserDefaults().setObject(my, forKey: "cards_bookmarks")
         NSUserDefaults().setBool(false, forKey: "pro_version")
         General.populateAllAreasInfo()
         General.populateGeoInfo()

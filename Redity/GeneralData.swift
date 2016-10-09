@@ -2,7 +2,7 @@
 //  GeneralData.swift
 //  Redity
 //
-//  Created by Admin on 22.06.16.
+//  Created by Vano on 22.06.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 

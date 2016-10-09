@@ -2,7 +2,7 @@
 //  PostsViewerViewController.swift
 //  Redity
 //
-//  Created by Admin on 16.09.16.
+//  Created by Vano on 16.09.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 
@@ -28,10 +28,7 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     var posts_table_view:UITableView!
     var navBarHeight:CGFloat = 0.0
     var current_posts_type = ""
-    var current_posts_data:[Int:NSMutableDictionary] = [Int:NSMutableDictionary]()
     var posts_section_to_card_id:[Int:Int] = [Int:Int]()
-    var posts_cells_frames:[Int:[String:CGRect]] = [Int:[String:CGRect]]()
-    var posts_cells_heights:[Int:CGFloat] = [Int:CGFloat]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,46 +72,17 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     func configureWithPostsType(type:String) {
         navigationItem.title = type == "saved" ? "Saved posts" : "My posts"
         current_posts_type = type
-        current_posts_data = [Int:NSMutableDictionary]()
         posts_section_to_card_id = [Int:Int]()
-        posts_cells_frames = [Int:[String:CGRect]]()
-        posts_cells_heights = [Int:CGFloat]()
         var section_id = 0
-        let docs_url = try? NSFileManager.defaultManager().URLForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: nil, create: false)
-        var archive_path = ""
-        if let docs = docs_url {
-            if type == "saved" {
-                archive_path = docs.URLByAppendingPathComponent("saved_posts_archive.arch").path!
-                let unarchived_dict = NSMutableDictionary(dictionary: NSKeyedUnarchiver.unarchiveObjectWithFile(archive_path) as! NSDictionary)
-                for (key,value) in unarchived_dict {
-                    if value["map_present"] as! Bool {
-                        let new_value = NSMutableDictionary(dictionary: value as! NSDictionary)
-                        let map_lat = CLLocationDegrees(value["map_lat"] as! Double)
-                        let map_long = CLLocationDegrees(value["map_long"] as! Double)
-                        let map_coords_value = NSValue(MKCoordinate: CLLocationCoordinate2DMake(map_lat, map_long))
-                        new_value.removeObjectForKey("map_lat")
-                        new_value.removeObjectForKey("map_long")
-                        new_value["map_coords"] = map_coords_value
-                        unarchived_dict[key as! Int] = new_value
-                    }
-                }
-                for (key,value) in unarchived_dict {
-                    current_posts_data[key as! Int] = value as! NSMutableDictionary
-                }
-                let all_cards_ids = (unarchived_dict.allKeys as! [Int]).sort({$0 > $1})
-                for cardId in all_cards_ids {
-                    posts_section_to_card_id[section_id++] = cardId
-                    let cell_dimensions = main_vc.getCardDimensionsWithCardData(current_posts_data[cardId] as! NSDictionary)
-                    posts_cells_heights[cardId] = cell_dimensions.cellHeight
-                    posts_cells_frames[cardId] = cell_dimensions.finalFrames
-                }
-            }
-            else {
-                //loading cards from the internet
-                //archive_path = docs.URLByAppendingPathComponent("my_posts_archive.arch").path!
-                print("loading my cards from the internet...")
-            }
+        var cards_ids_display =  NSUserDefaults().arrayForKey(type == "saved" ? "cards_bookmarks" : "my_posts_cards_ids") as! [Int]
+        cards_ids_display.sortInPlace({$0 > $1})
+        for cardId in cards_ids_display {
+            posts_section_to_card_id[section_id++] = cardId
         }
+        if type == "my" {
+            //should check server for new cards
+        }
+        posts_empty_label.text = type == "my" ? "No saved posts!" : "No posts from you!"
         posts_table_view.reloadData()
     }
     
@@ -139,33 +107,35 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if current_posts_data[posts_section_to_card_id[indexPath.section]!]!["images_present"] as! Bool {
+        let current_card_data = main_vc.getCardDataForCardId(posts_section_to_card_id[indexPath.section]!)
+        if current_card_data!["images_present"] as! Bool {
             let feed_cell_img = tableView.dequeueReusableCellWithIdentifier("feed_cell_images") as! FeedCellImages
             feed_cell_img.setCardIdWithId(posts_section_to_card_id[indexPath.section]!)
             feed_cell_img.setHandlersWithMenuHandler(cardMenuPressed, replyHandler: cardReplyPressed, shareHandler: cardSharePressed)
-            feed_cell_img.setFrames(posts_cells_frames[posts_section_to_card_id[indexPath.section]!]!)
+            feed_cell_img.setFrames(main_vc.getCardFramesForCardId(posts_section_to_card_id[indexPath.section]!)!)
             return feed_cell_img
         }
         else {
             let feed_cell = tableView.dequeueReusableCellWithIdentifier("feed_cell") as! FeedCellPlain
             feed_cell.setCardIdWithId(posts_section_to_card_id[indexPath.section]!)
             feed_cell.setHandlersWithMenuHandler(cardMenuPressed, replyHandler: cardReplyPressed, shareHandler: cardSharePressed)
-            feed_cell.setFrames(posts_cells_frames[posts_section_to_card_id[indexPath.section]!]!)
+            feed_cell.setFrames(main_vc.getCardFramesForCardId(posts_section_to_card_id[indexPath.section]!)!)
             return feed_cell
         }
     }
     
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        if current_posts_data[posts_section_to_card_id[indexPath.section]!]!["images_present"] as! Bool {
-            (cell as! FeedCellImages).setContent(current_posts_data[posts_section_to_card_id[indexPath.section]!]!)
+        let current_card_data = main_vc.getCardDataForCardId(posts_section_to_card_id[indexPath.section]!)
+        if current_card_data!["images_present"] as! Bool {
+            (cell as! FeedCellImages).setContent(current_card_data!)
             main_vc.startLoadingImagesForCardId(posts_section_to_card_id[indexPath.section]!, withAssigningType: "feed_sep")
-            if current_posts_data[posts_section_to_card_id[indexPath.section]!]!["map_present"] as! Bool {
+            if current_card_data!["map_present"] as! Bool {
                 main_vc.startLoadingMapSnapshotForCardId(posts_section_to_card_id[indexPath.section]!, withStyle: "feed_sep", withAssigning: true)
             }
         }
         else {
-            (cell as! FeedCellPlain).setContent(current_posts_data[posts_section_to_card_id[indexPath.section]!]!)
-            if current_posts_data[posts_section_to_card_id[indexPath.section]!]!["map_present"] as! Bool {
+            (cell as! FeedCellPlain).setContent(current_card_data!)
+            if current_card_data!["map_present"] as! Bool {
                 main_vc.startLoadingMapSnapshotForCardId(posts_section_to_card_id[indexPath.section]!, withStyle: "feed_sep", withAssigning: true)
             }
         }
@@ -177,7 +147,7 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return posts_cells_heights[posts_section_to_card_id[indexPath.section]!]!
+        return main_vc.getCardHeightForCardId(posts_section_to_card_id[indexPath.section]!)!
     }
     
     func cardMenuPressed(cardId:Int) {
@@ -256,14 +226,13 @@ class PostsViewerViewController:UIViewController, UITableViewDelegate, UITableVi
     
     func deleteAllPostsButtonPressed(sender:UIBarButtonItem) {
         let saved_cards_ids = NSMutableArray(array: NSUserDefaults().arrayForKey("cards_bookmarks") as! [Int])
-        current_posts_data = [Int:NSMutableDictionary]()
         posts_section_to_card_id = [Int:Int]()
         for cardId in saved_cards_ids {
             let post_card_id = cardId as! Int
             let section_main_feed = main_vc.feedSectionForCardId(post_card_id)
             if section_main_feed != -1 {
                 var images_present = false
-                if main_vc.current_feed_cells_data[post_card_id]!["images_present"] as! Bool {
+                if main_vc.getCardDataForCardId(post_card_id)!["images_present"] as! Bool {
                     images_present = true
                 }
                 if images_present {

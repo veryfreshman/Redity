@@ -2,7 +2,7 @@
 //  OnePostViewController.swift
 //  Redity
 //
-//  Created by Admin on 30.06.16.
+//  Created by Vano on 30.06.16.
 //  Copyright © 2016 Vanoproduction. All rights reserved.
 //
 
@@ -341,6 +341,10 @@ class OnePostViewController:UIViewController, UIScrollViewDelegate, UIGestureRec
         save_button.setTitle(new_title, forState: .Normal)
         save_button.setBackgroundImage(UIImage(named: new_image_icon_name)!, forState: .Normal)
         recalculateButtonsLabels()
+    }
+    
+    func setLoading() {
+        
     }
     
     func menuButtonPressed(sender:UIBarButtonItem) {
